@@ -1,0 +1,15 @@
+{
+  "name": "joipa-school-ai",
+  "version": "1.0.0",
+  "description": "Personal AI assistant for students, with server-side Gemini proxy",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
