@@ -1,0 +1,7 @@
+Mic button fix plan
+
+1) Find root cause: voice.js uses globals (recording, recognition, synth, muted, audioUnlocked, isCinematic, selectedVoice, voiceReady, addMsg, sendMessage/sendCinMessage, recognition instance) without declaring them; if any are undefined, toggleMic can throw and mic won’t work.
+2) Patch voice.js: add safe default initialization for required globals, add defensive guards around addMsg / sendMessage / sendCinMessage, and ensure mic UI state resets even on exceptions.
+3) Add small console logging so errors are visible in DevTools.
+4) Quick verify: open index.html in Chrome/Edge, click mic, approve mic permission, ensure message is sent after speech.
+
