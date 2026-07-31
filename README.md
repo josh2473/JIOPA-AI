@@ -1,2 +1,2 @@
-# JOIPA-SCHOOL-AI
+# JOIPA-AI
 Personnal AI assistance for student
