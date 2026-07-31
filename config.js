@@ -198,3 +198,119 @@ const DEMO_INFO = {
     desc:  "Atoms consist of a nucleus containing protons and neutrons, surrounded by electrons in orbital shells. Electrons exist in probability clouds called orbitals, described by quantum mechanics. The number of protons defines the element. When electrons jump between energy levels, they emit photons of specific wavelengths — creating all the colours we see, from fire to neon signs to the entire visible spectrum.",
   },
 };
+
+
+/* ══════════════════════════════════════════════════
+   ANTHEMS / PLEDGE / SCHOOL SONG
+   Each entry: optional real audio file (tried first),
+   plus lines[] used for the TTS fallback (spoken/sung
+   line by line so it doesn't rush through as one blob).
+   If `audio` file is missing/fails to load, TTS is used
+   automatically — no extra setup needed.
+══════════════════════════════════════════════════ */
+const ANTHEM_DATA = {
+  ghana: {
+    title: 'National Anthem of Ghana',
+    subtitle: '"God Bless Our Homeland Ghana"',
+    audio: 'audio/ghana-national-anthem.mp3',
+    lines: [
+      'God bless our homeland Ghana,',
+      'And make our nation great and strong,',
+      'Bold to defend forever',
+      'The cause of Freedom and Right;',
+      'Fill our hearts with true humility,',
+      'Make us cherish fearless honesty,',
+      'And help us to resist oppressor\'s rule',
+      'With all our will and strength for evermore.',
+      'Hail to thy name, O Ghana,',
+      'To thee we make our solemn vow:',
+      'Steadfast to build together',
+      'A nation strong in Unity;',
+      'With our gifts of mind and strength of arm,',
+      'Whether night or day, in the mist or storm,',
+      'In every need, whate\'er the call may be,',
+      'To serve thee, Ghana, now and evermore.',
+      'Raise high the flag of Ghana',
+      'And one with Africa advance;',
+      'Black star of hope and honour',
+      'To all who struggle for freedom;',
+      'Where the banner of Ghana freely flies,',
+      'May the way to freedom truly lie;',
+      'Arise, arise, O sons of Ghanaland,',
+      'And under God march on for evermore.',
+    ],
+  },
+  pledge: {
+    title: 'The National Pledge of Ghana',
+    subtitle: 'Recited standing at attention, right hand over the heart',
+    audio: 'audio/ghana-pledge.mp3',
+    lines: [
+      'I promise on my honour',
+      'to be faithful and loyal to Ghana my motherland.',
+      'I pledge myself to the service of Ghana',
+      'with all my strength and with all my heart.',
+      'I promise to hold in high esteem',
+      'Our heritage, won for us through the blood and toil of our fathers;',
+      'and I pledge myself in all things',
+      'to uphold and defend the good name of Ghana.',
+      'So help me God.',
+    ],
+  },
+  school: {
+    title: 'JIOPA School Anthem',
+    subtitle: 'Jiopa Early Childcare Montessori School',
+    audio: 'audio/jiopa-school-anthem.mp3',
+    // TODO: replace with actual JIOPA school anthem lyrics once provided.
+    lines: [
+      'The school anthem has not been added yet.',
+      'Ask Josh to provide the JIOPA school anthem lyrics,',
+      'and I will be ready to sing it with pride!',
+    ],
+  },
+};
+
+
+/* ══════════════════════════════════════════════════
+   PHOTO GALLERY
+   Add one entry per photo. `src` is relative to the app
+   root (same folder as index.html), e.g. "gallery/photo1.jpg".
+   `caption` shows under the enlarged image.
+══════════════════════════════════════════════════ */
+const GALLERY_PHOTOS = [
+  { src: 'gallery/photo1.jpg',  caption: 'Career Day — students dressed as police officers, a soldier, and a doctor' },
+  { src: 'gallery/photo2.jpg',  caption: 'Graduation night — JIOPA graduates in caps, gowns, and kente stoles' },
+  { src: 'gallery/photo3.jpg',  caption: 'Career Day — a young road safety officer with classmates in uniform' },
+  { src: 'gallery/photo4.jpg',  caption: 'Career Day — future police officers, pilots, and a judge' },
+  { src: 'gallery/photo6.jpg',  caption: 'Cultural Day — JIOPA students in traditional Ghanaian kente and smock' },
+  { src: 'gallery/photo7.jpg',  caption: 'Cultural Day — students proudly dressed in traditional Ghanaian attire' },
+  { src: 'gallery/photo8.jpg',  caption: 'Cultural Day — the whole group celebrating Ghanaian heritage and dress' },
+  { src: 'gallery/photo9.jpg',  caption: 'Career Day — a student as a doctor with stethoscope' },
+  { src: 'gallery/photo10.jpg', caption: 'JIOPA students in their green and white school uniform' },
+  { src: 'gallery/photo11.jpg', caption: 'Career Day — students dressed as police officers on duty' },
+];
+
+
+/* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER TRIGGERS
+   Keyword phrases (matched as substrings, lowercase)
+   that trigger a full-screen video or effect overlay.
+   Add more keywords to the arrays to expand matching.
+══════════════════════════════════════════════════ */
+const TAKEOVER_TRIGGERS = {
+  video: {
+    keywords: ['play video', 'special video', 'jiopa video', 'watch video'],
+    src: 'video/special.mp4',
+  },
+  effect: {
+    keywords: ['celebrate', 'special effect', 'party mode', 'surprise me'],
+  },
+};
+
+const GALLERY_TRIGGERS = ['show me photos', 'school gallery', 'pictures of jiopa', 'photo gallery', 'show gallery', 'jiopa photos'];
+
+const ANTHEM_TRIGGERS = {
+  ghana:  ['sing the national anthem', 'ghana national anthem', 'sing ghana anthem'],
+  pledge: ['say the pledge', 'national pledge', 'recite the pledge'],
+  school: ['sing the school anthem', 'jiopa anthem', 'school song'],
+};
+

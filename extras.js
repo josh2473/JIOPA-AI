@@ -215,28 +215,6 @@ function initAskBadge() {
           box-shadow: 0 8px 22px rgba(200,17,85,0.35);
         }
       }
-      #ask-badge {
-        position: fixed;
-        bottom: 132px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 300;
-        font-family: 'Fredoka', 'Nunito', sans-serif;
-        font-weight: 600;
-        font-size: 0.62rem;
-        letter-spacing: 0.06em;
-        color: #FFF9EE;
-        background: linear-gradient(135deg, #D4A548, #C81155, #8A6E3F);
-        padding: 7px 20px;
-        border-radius: 30px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: opacity 0.5s;
-        animation: askBounce 2.5s ease-in-out infinite;
-        white-space: nowrap;
-      }
     `;
     document.head.appendChild(style);
   }

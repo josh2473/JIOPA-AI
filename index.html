@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JIOPA AI — Future Classroom Assistant</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='8' y1='8' x2='56' y2='56'%3E%3Cstop stop-color='%2300d4ff'/%3E%3Cstop offset='1' stop-color='%2300ff88'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%23061018'/%3E%3Cpath d='M32 8 51 19v26L32 56 13 45V19L32 8Z' fill='none' stroke='url(%23g)' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='11' fill='url(%23g)'/%3E%3Cpath d='M24 32h16M32 24v16' stroke='%23061018' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/jpeg" href="jiopa-logo.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
@@ -58,15 +58,6 @@
 <div id="mic-status" style="display:none">&#127897; LISTENING...</div>
 <button id="mute-btn" style="display:none" onclick="toggleMute()">&#128266;</button>
 
-<!-- AI Status Indicator -->
-<div id="ai-status">
-  <div class="ai-dot" id="ai-dot"></div>
-  <span id="ai-status-text">AI OFFLINE</span>
-</div>
-
-<!-- Layout Toggle -->
-<button id="layout-toggle" onclick="toggleLayout()">&#8862; CINEMATIC MODE</button>
-
 <!-- Cinematic overlay quick toggle (mobile side button) -->
 <button id="cin-side-toggle" onclick="toggleCinematicOverlay()" aria-label="Hide or show cinematic overlay">
   HIDE CINEMATIC
@@ -80,7 +71,11 @@
 
   <!-- HEADER -->
   <div id="header" class="panel">
-    <div class="header-logo">JIOP<span>A</span> AI</div>
+    <div class="header-logo">JIOPA <span>AI</span></div>
+    <div id="ai-status">
+      <div class="ai-dot" id="ai-dot"></div>
+      <span id="ai-status-text">AI OFFLINE</span>
+    </div>
     <div class="header-stats">
       <div class="stat-item">
         <span class="stat-label">VISITORS</span>
@@ -102,6 +97,7 @@
     <div style="display:flex;align-items:center;gap:8px">
 <div class="header-time" id="header-time">--:--:--</div>
 <button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme" aria-pressed="false">☀️</button>
+<button id="layout-toggle" onclick="toggleLayout()">&#8862; CINEMATIC</button>
     </div>
   </div>
 
@@ -167,24 +163,10 @@
     <div style="margin-top:auto;padding-top:6px;">
       <div class="panel-title" style="margin-top:5px;">&#11041; System Status</div>
       <div class="mini-widget">
-        <div class="widget-label">AI CONFIDENCE</div>
-        <div class="widget-value">97%</div>
-        <div class="widget-bar">
-          <div class="widget-fill" style="width:97%;background:linear-gradient(90deg,#8A6E3F,#C81155)"></div>
-        </div>
-      </div>
-      <div class="mini-widget">
         <div class="widget-label">CPU LOAD</div>
         <div class="widget-value" id="w-cpu">--</div>
         <div class="widget-bar">
           <div class="widget-fill" id="wf-cpu" style="width:0%;background:linear-gradient(90deg,#5C8A5A,#D4A548)"></div>
-        </div>
-      </div>
-      <div class="mini-widget">
-        <div class="widget-label">NEURAL CORE</div>
-        <div class="widget-value" style="color:#5C8A5A">ONLINE</div>
-        <div class="widget-bar">
-          <div class="widget-fill" style="width:100%;background:linear-gradient(90deg,#5C8A5A,#C81155)"></div>
         </div>
       </div>
     </div>
@@ -278,6 +260,10 @@
     <div class="demo-card" onclick="openDemo('atom')">
       <canvas class="mini-canvas" id="mini-atom"></canvas>
       <div class="demo-label">ATOMIC MODEL</div>
+    </div>
+    <div class="demo-card" onclick="openGallery()" style="justify-content:center;">
+      <div class="demo-label" style="font-size:1.3rem;position:static;">📷</div>
+      <div class="demo-label">PHOTO GALLERY</div>
     </div>
   </div>
 
@@ -400,6 +386,44 @@
 </div>
 
 
+<!-- ═══════════════════════════════════
+     PHOTO GALLERY
+═══════════════════════════════════ -->
+<div id="gallery-overlay">
+  <div id="gallery-content">
+    <div id="gallery-title">📷 JIOPA School Gallery</div>
+    <div id="gallery-close" onclick="closeGallery()">&#10005;</div>
+    <div id="gallery-grid"></div>
+  </div>
+</div>
+
+<div id="gallery-lightbox">
+  <div id="gallery-lightbox-close" onclick="closeGalleryLightbox()">&#10005;</div>
+  <div id="gallery-lightbox-prev" onclick="galleryPrev()">&#10094;</div>
+  <img id="gallery-lightbox-img" src="" alt="JIOPA School photo">
+  <div id="gallery-lightbox-next" onclick="galleryNext()">&#10095;</div>
+  <div id="gallery-lightbox-caption"></div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     FULL-SCREEN TAKEOVER: VIDEO
+═══════════════════════════════════ -->
+<div id="takeover-overlay">
+  <div id="takeover-close" onclick="closeTakeover()">&#10005;</div>
+  <video id="takeover-video" playsinline></video>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     FULL-SCREEN TAKEOVER: ANIMATED EFFECT
+═══════════════════════════════════ -->
+<div id="takeover-effect-overlay">
+  <div id="takeover-effect-close" onclick="closeTakeover()">&#10005;</div>
+  <canvas id="takeover-effect-canvas"></canvas>
+</div>
+
+
 
 
 
@@ -446,6 +470,7 @@
 <script src="voice.js"></script>
 <script src="gemini.js"></script>
 <script src="chat.js"></script>
+<script src="features.js"></script>
 <script src="modes.js"></script>
 <script src="canvas.js"></script>
 <script src="extras.js"></script>

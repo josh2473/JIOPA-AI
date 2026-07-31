@@ -229,7 +229,7 @@ function toggleLayout() {
     }
 
     if (btn) {
-      btn.textContent   = '⊟ DASHBOARD MODE';
+      btn.textContent   = '⊟ DASHBOARD';
       btn.style.color   = `rgb(${c.r},${c.g},${c.b})`;
       btn.style.borderColor = `rgba(${c.r},${c.g},${c.b},0.5)`;
     }
@@ -274,7 +274,7 @@ function toggleLayout() {
       setTimeout(() => { app.classList.add('visible'); }, 20);
     }
     if (btn) {
-      btn.textContent       = '⊞ CINEMATIC MODE';
+      btn.textContent       = '⊞ CINEMATIC';
       btn.style.color       = 'var(--neon-blue)';
       btn.style.borderColor = 'rgba(200,17,85,0.4)';
     }
