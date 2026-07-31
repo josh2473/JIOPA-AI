@@ -297,10 +297,18 @@ const GALLERY_PHOTOS = [
    Add more keywords to the arrays to expand matching.
 ══════════════════════════════════════════════════ */
 const TAKEOVER_TRIGGERS = {
-  video: {
-    keywords: ['play video', 'special video', 'jiopa video', 'watch video'],
-    src: 'video/special.mp4',
-  },
+  videos: [
+    {
+      keywords: ['play video', 'special video', 'jiopa video', 'watch video', 'amazing video'],
+      src: 'video/special-impossible.mp4',
+      label: 'See the Impossible',
+    },
+    {
+      keywords: ['underwater', 'ocean video', 'sea video', 'underwater life'],
+      src: 'video/special-underwater.mp4',
+      label: 'Underwater Life',
+    },
+  ],
   effect: {
     keywords: ['celebrate', 'special effect', 'party mode', 'surprise me'],
   },

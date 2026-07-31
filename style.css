@@ -375,6 +375,37 @@ body:hover #cin-side-toggle-web,
 }
 
 
+/* ══════════════════════════════════════════════════
+   TABLET (701px – 1024px)
+   Narrower 3-column grid, everything else stays the
+   same layout shape as desktop — just tighter spacing.
+══════════════════════════════════════════════════ */
+@media (min-width: 701px) and (max-width: 1024px) {
+  #app {
+    grid-template-columns: 210px 1fr 250px;
+    gap: 6px; padding: 6px;
+  }
+  .header-logo { font-size: 1.05rem; }
+  .header-stats { gap: 12px; }
+  .stat-label { font-size: .54rem; }
+  .stat-value { font-size: .8rem; }
+  #ai-status { font-size: .56rem; padding: 4px 9px; }
+  #layout-toggle { font-size: .56rem; padding: 6px 10px; }
+
+  .mode-desc { font-size: .64rem; }
+  #avatar-container { transform: scale(.88); }
+
+  .demo-card { width: 118px; height: 80px; }
+  .demo-label { font-size: .48rem; }
+
+  #gallery-content { width: min(94vw, 700px); }
+  #gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+
+  #quiz-box { width: min(94vw, 440px); }
+  #modal-content { width: min(94vw, 620px); }
+}
+
+
 @media (max-width: 700px) {
   /* Keep the side button away from chat input area */
   #cin-side-toggle { top: 165px; right: 4px; }
@@ -1467,6 +1498,125 @@ body.dark-mode #theme-toggle {
   #mute-btn {
     bottom: 104px;
   }
+
+  /* ── PHOTO GALLERY: mobile ── */
+  #gallery-content {
+    width: 94vw;
+    max-height: 90vh;
+    padding: 16px;
+  }
+  #gallery-title { font-size: .84rem; }
+  #gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+  }
+  #gallery-lightbox-img { max-width: 92vw; max-height: 68vh; }
+  #gallery-lightbox-prev, #gallery-lightbox-next {
+    width: 38px; height: 38px; font-size: 1.1rem;
+  }
+  #gallery-lightbox-prev { left: 8px; }
+  #gallery-lightbox-next { right: 8px; }
+  #gallery-lightbox-caption { font-size: .74rem; max-width: 90vw; }
+  #gallery-close, #gallery-lightbox-close { width: 32px; height: 32px; }
+
+  /* ── FULL-SCREEN TAKEOVER: mobile ── */
+  #takeover-close, #takeover-effect-close {
+    top: 12px; right: 14px; width: 38px; height: 38px; font-size: 1.1rem;
+  }
+
+  /* ── QUIZ: mobile ── */
+  #quiz-box {
+    width: 94vw;
+    padding: 18px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .quiz-title { font-size: .82rem; }
+  #quiz-q { font-size: .84rem; }
+  .quiz-opt { font-size: .78rem; padding: 9px 12px; }
+  .quiz-btn { font-size: .62rem; padding: 9px; }
+  .quiz-diff-row { gap: 5px; }
+  .diff-btn { font-size: .54rem; padding: 6px 5px; }
+
+  /* ── DEMO MODAL: mobile ── */
+  #modal-content {
+    width: 94vw;
+    max-height: 88vh;
+    padding: 16px;
+  }
+  #modal-title { font-size: .84rem; }
+  #modal-desc { font-size: .72rem; }
+  #modal-canvas { min-height: 200px; }
+}
+
+
+/* ══════════════════════════════════════════════════
+   SMALL PHONES (max-width: 380px)
+   e.g. iPhone SE, older/compact Android devices
+══════════════════════════════════════════════════ */
+@media (max-width: 380px) {
+  .header-logo { font-size: .86rem; }
+  .header-logo::before { width: 24px; height: 24px; }
+  #ai-status { font-size: .5rem; padding: 3px 7px; }
+  #layout-toggle { font-size: .5rem; padding: 5px 8px; }
+  .header-stats .stat-item:nth-child(2) { display: none; }
+
+  .mode-name { font-size: .62rem; }
+  .mode-desc { font-size: .58rem; padding-left: 22px; }
+
+  #avatar-container { transform: scale(.8); }
+  .jiopa-name { font-size: 1.2rem; }
+
+  #chat-input { font-size: .74rem; padding: 7px 9px; }
+  .icon-btn { width: 30px; height: 30px; font-size: .88rem; }
+
+  .demo-card { width: 108px; height: 74px; }
+  .demo-label { font-size: .44rem; }
+
+  #gallery-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+  #quiz-box, #modal-content, #gallery-content { width: 96vw; padding: 12px; }
+  .quiz-opt { font-size: .72rem; padding: 8px 10px; }
+}
+
+
+/* ══════════════════════════════════════════════════
+   LANDSCAPE PHONES (short viewport height)
+   Prevents content from being pushed off-screen when
+   a phone is rotated sideways.
+══════════════════════════════════════════════════ */
+@media (max-height: 450px) and (orientation: landscape) {
+  #app {
+    grid-template-rows: 46px auto auto auto 70px;
+    overflow-y: auto;
+  }
+  #header { min-height: 46px; padding: 4px 10px; }
+  .header-logo { font-size: .82rem; }
+  #ai-status, #layout-toggle { font-size: .48rem; padding: 3px 8px; }
+  .header-stats { display: none; }
+
+  #left-panel { max-height: 110px; }
+  .mode-card { padding: 6px 8px; }
+  .mode-desc { display: none; }
+
+  #center-panel { padding: 2px 0; }
+  #avatar-container { transform: scale(.6); }
+  .jiopa-name { font-size: .95rem; margin-top: 2px; }
+  .jiopa-tagline { display: none; }
+
+  #right-panel { padding: 6px; gap: 4px; }
+  #chat-messages { max-height: 90px; }
+
+  #bottom-panel { display: none; }
+
+  #gallery-content, #quiz-box, #modal-content {
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+  #gallery-lightbox-img { max-height: 60vh; }
+
+  #cin-avatar-img-wrap { height: 70vh; bottom: 8vh; }
+  #cin-left { padding: 10px 16px 0 16px; }
+  #cin-speech { font-size: .72rem; padding: 8px 12px; min-height: 40px; }
 }
 
 

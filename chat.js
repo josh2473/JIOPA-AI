@@ -17,6 +17,12 @@ async function sendMessage() {
   input.value = '';
   addMsg('user', text);
   incrementQueryCount();
+
+  // Check for gallery/anthem/pledge/video/effect keyword triggers first
+  if (typeof checkFeatureTriggers === 'function' && checkFeatureTriggers(text)) {
+    return;
+  }
+
   showTyping(true);
 
   let reply;
@@ -58,6 +64,12 @@ async function sendCinMessage() {
   }
 
   incrementQueryCount();
+
+  // Check for gallery/anthem/pledge/video/effect keyword triggers first
+  if (typeof checkFeatureTriggers === 'function' && checkFeatureTriggers(text)) {
+    return;
+  }
+
   showTyping(true);
 
   let reply;
