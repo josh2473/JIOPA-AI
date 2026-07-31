@@ -287,6 +287,18 @@ const GALLERY_PHOTOS = [
   { src: 'gallery/photo9.jpg',  caption: 'Career Day — a student as a doctor with stethoscope' },
   { src: 'gallery/photo10.jpg', caption: 'JIOPA students in their green and white school uniform' },
   { src: 'gallery/photo11.jpg', caption: 'Career Day — students dressed as police officers on duty' },
+
+  // ── PLACEHOLDERS — add real files to gallery/ then update the caption ──
+  { src: 'gallery/photo12.jpg', caption: 'Add photo12.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo13.jpg', caption: 'Add photo13.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo14.jpg', caption: 'Add photo14.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo15.jpg', caption: 'Add photo15.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo16.jpg', caption: 'Add photo16.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo17.jpg', caption: 'Add photo17.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo18.jpg', caption: 'Add photo18.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo19.jpg', caption: 'Add photo19.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo20.jpg', caption: 'Add photo20.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo21.jpg', caption: 'Add photo21.jpg to gallery/ and update this caption' },
 ];
 
 
@@ -308,6 +320,20 @@ const TAKEOVER_TRIGGERS = {
       src: 'video/special-underwater.mp4',
       label: 'Underwater Life',
     },
+
+    // ── PLACEHOLDERS — add the real .mp4 to video/, then set real
+    //    keywords + label. Numbered keywords below just keep them
+    //    from accidentally triggering before you customise them. ──
+    { keywords: ['play video 3'],  src: 'video/special-3.mp4',  label: 'Special Video 3' },
+    { keywords: ['play video 4'],  src: 'video/special-4.mp4',  label: 'Special Video 4' },
+    { keywords: ['play video 5'],  src: 'video/special-5.mp4',  label: 'Special Video 5' },
+    { keywords: ['play video 6'],  src: 'video/special-6.mp4',  label: 'Special Video 6' },
+    { keywords: ['play video 7'],  src: 'video/special-7.mp4',  label: 'Special Video 7' },
+    { keywords: ['play video 8'],  src: 'video/special-8.mp4',  label: 'Special Video 8' },
+    { keywords: ['play video 9'],  src: 'video/special-9.mp4',  label: 'Special Video 9' },
+    { keywords: ['play video 10'], src: 'video/special-10.mp4', label: 'Special Video 10' },
+    { keywords: ['play video 11'], src: 'video/special-11.mp4', label: 'Special Video 11' },
+    { keywords: ['play video 12'], src: 'video/special-12.mp4', label: 'Special Video 12' },
   ],
   effect: {
     keywords: ['celebrate', 'special effect', 'party mode', 'surprise me'],
