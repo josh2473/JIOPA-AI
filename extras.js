@@ -460,20 +460,20 @@ function initDraggableCinematicSideToggleElement(el) {
 
 
 
-/* THEME TOGGLE — Classic (light) -> Dusk (dark) -> Classic
+/* THEME TOGGLE — Classic (light) -> Cyberpunk (neon) -> Classic
    Never persisted: every fresh load always starts on Classic. */
-const THEME_SEQUENCE = ['classic', 'dusk'];
+const THEME_SEQUENCE = ['classic', 'cyberpunk'];
 let currentTheme = 'classic';
 
 function applyThemeClasses() {
   document.body.classList.remove('dark-mode', 'theme-cyberpunk');
-  if (currentTheme === 'dusk') document.body.classList.add('dark-mode');
+  if (currentTheme === 'cyberpunk') document.body.classList.add('theme-cyberpunk');
   updateThemeToggleUI();
 }
 
 function updateThemeToggleUI() {
-  const icons = { classic: '☀️', dusk: '🌙' };
-  const labels = { classic: 'Classic', dusk: 'Dusk' };
+  const icons = { classic: '☀️', cyberpunk: '⚡' };
+  const labels = { classic: 'Classic', cyberpunk: 'Cyberpunk' };
   const icon = icons[currentTheme];
 
   ['theme-toggle', 'theme-toggle-cin'].forEach(id => {
