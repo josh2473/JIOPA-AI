@@ -36,12 +36,12 @@ RULES:
 
 /* ── MODE CONFIGURATION ── */
 const MODE_CONFIG = {
-  general:  { r: 0,   g: 212, b: 255, hue: 0,   label: 'GENERAL ASSISTANT' },
-  science:  { r: 0,   g: 255, b: 136, hue: 80,  label: 'SCIENCE TEACHER'   },
-  quiz:     { r: 123, g: 47,  b: 255, hue: 270, label: 'QUIZ MASTER'        },
-  robotics: { r: 255, g: 107, b: 53,  hue: 20,  label: 'ROBOTICS EXPERT'   },
-  school:   { r: 0,   g: 255, b: 234, hue: 150, label: 'JIOPA SCHOOL'       },
-  future:   { r: 255, g: 45,  b: 155, hue: 320, label: 'FUTURE PREDICTOR'   },
+  general:  { r: 200, g: 17,  b: 85,  hue: 0,   label: 'GENERAL ASSISTANT' },
+  science:  { r: 92,  g: 138, b: 90,  hue: 100, label: 'SCIENCE TEACHER'   },
+  quiz:     { r: 138, g: 110, b: 63,  hue: 30,  label: 'QUIZ MASTER'        },
+  robotics: { r: 196, g: 105, b: 59,  hue: 15,  label: 'ROBOTICS EXPERT'   },
+  school:   { r: 156, g: 29,  b: 99,  hue: 330, label: 'JIOPA SCHOOL'       },
+  future:   { r: 214, g: 41,  b: 92,  hue: 350, label: 'FUTURE PREDICTOR'   },
 };
 
 

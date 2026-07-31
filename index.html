@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JIOPA AI — Future Classroom Assistant</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='8' y1='8' x2='56' y2='56'%3E%3Cstop stop-color='%2300d4ff'/%3E%3Cstop offset='1' stop-color='%2300ff88'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%23061018'/%3E%3Cpath d='M32 8 51 19v26L32 56 13 45V19L32 8Z' fill='none' stroke='url(%23g)' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='11' fill='url(%23g)'/%3E%3Cpath d='M24 32h16M32 24v16' stroke='%23061018' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 </head>
@@ -101,7 +101,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:8px">
 <div class="header-time" id="header-time">--:--:--</div>
-
+<button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme" aria-pressed="false">☀️</button>
     </div>
   </div>
 
@@ -170,21 +170,21 @@
         <div class="widget-label">AI CONFIDENCE</div>
         <div class="widget-value">97%</div>
         <div class="widget-bar">
-          <div class="widget-fill" style="width:97%;background:linear-gradient(90deg,#7b2fff,#00d4ff)"></div>
+          <div class="widget-fill" style="width:97%;background:linear-gradient(90deg,#8A6E3F,#C81155)"></div>
         </div>
       </div>
       <div class="mini-widget">
         <div class="widget-label">CPU LOAD</div>
         <div class="widget-value" id="w-cpu">--</div>
         <div class="widget-bar">
-          <div class="widget-fill" id="wf-cpu" style="width:0%;background:linear-gradient(90deg,#00ff88,#00ffea)"></div>
+          <div class="widget-fill" id="wf-cpu" style="width:0%;background:linear-gradient(90deg,#5C8A5A,#D4A548)"></div>
         </div>
       </div>
       <div class="mini-widget">
         <div class="widget-label">NEURAL CORE</div>
-        <div class="widget-value" style="color:#00ff88">ONLINE</div>
+        <div class="widget-value" style="color:#5C8A5A">ONLINE</div>
         <div class="widget-bar">
-          <div class="widget-fill" style="width:100%;background:linear-gradient(90deg,#00ff88,#00d4ff)"></div>
+          <div class="widget-fill" style="width:100%;background:linear-gradient(90deg,#5C8A5A,#C81155)"></div>
         </div>
       </div>
     </div>
@@ -373,7 +373,7 @@
       </div>
       <div class="cin-stat">
         <span class="cin-stat-label">AI ENGINE</span>
-        <span class="cin-stat-val" style="color:#00ff88">AI</span>
+        <span class="cin-stat-val" style="color:#5C8A5A">AI</span>
       </div>
     </div>
   </div>

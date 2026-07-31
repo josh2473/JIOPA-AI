@@ -34,26 +34,25 @@ function applyMode(mode) {
     setTimeout(() => { flash.style.opacity = '0'; }, 600);
   }
 
-  /* 3. Dashboard avatar image — hue-rotate to match mode colour */
+  /* 3. Dashboard avatar image — subtle hue-shift to match mode colour */
   const avatarImg = document.getElementById('avatar-img');
   if (avatarImg) {
     avatarImg.style.filter =
-      `brightness(1.15) saturate(1.4) hue-rotate(${c.hue}deg) contrast(1.05)`;
+      `brightness(1.02) saturate(1.05) hue-rotate(${c.hue}deg) contrast(1.02)`;
   }
 
-  /* 4. Cinematic avatar image — includes glow in mode colour */
+  /* 4. Cinematic avatar image — includes soft glow in mode colour */
   const cinImg = document.getElementById('cin-avatar-img');
   if (cinImg) {
     cinImg.style.filter =
-      `drop-shadow(0 0 40px rgba(${c.r},${c.g},${c.b},0.8))
-       drop-shadow(0 0 80px rgba(${c.r},${c.g},${c.b},0.4))
-       brightness(1.1) saturate(1.4) hue-rotate(${c.hue}deg)`;
+      `drop-shadow(0 10px 24px rgba(${c.r},${c.g},${c.b},0.28))
+       brightness(1.02) saturate(1.05) hue-rotate(${c.hue}deg)`;
   }
 
   /* 5. Cinematic background tint */
   const cinBg = document.getElementById('cin-avatar-bg');
   if (cinBg) {
-    cinBg.style.filter = `brightness(0.5) saturate(1.3) hue-rotate(${c.hue}deg)`;
+    cinBg.style.filter = `brightness(0.9) saturate(1.05) hue-rotate(${c.hue}deg)`;
   }
 
   /* 6. Energy rings — colour to match mode */
@@ -235,9 +234,8 @@ function toggleLayout() {
       btn.style.borderColor = `rgba(${c.r},${c.g},${c.b},0.5)`;
     }
 
-    // Cinematic layout should be in light mode (remove dark-only class)
-    try { document.body.classList.remove('dark-mode'); } catch (e) { /* ignore */ }
-
+    // Cinematic layout no longer forces a theme — current theme choice persists
+    // across layout switches (see toggleTheme()/applyThemeClasses() in extras.js).
 
     // Ensure a theme toggle exists inside cinematic layout for visibility
     try {
@@ -252,18 +250,15 @@ function toggleLayout() {
         cinBtn.style.right = '16px';
         cinBtn.style.zIndex = 1600;
         cinBtn.style.display = 'block';
-        cinBtn.innerHTML = '🌙';
-        cinBtn.setAttribute('aria-pressed', 'true');
 
         // Bind directly to the existing global toggleTheme() so cinematic switch always works.
         cinBtn.onclick = () => { try { toggleTheme(); } catch (e) { /* ignore */ } };
         document.body.appendChild(cinBtn);
       } else {
         existing.style.display = 'block';
-        existing.innerHTML = '🌙';
-        existing.setAttribute('aria-pressed', 'true');
-
       }
+      // Sync icon/label/aria-pressed to whatever the current theme actually is
+      try { updateThemeToggleUI(); } catch (e) { /* ignore */ }
     } catch (e) { /* ignore DOM errors */ }
   } else {
     // Ensure AI status is shown as live while dashboard is active
@@ -281,11 +276,11 @@ function toggleLayout() {
     if (btn) {
       btn.textContent       = '⊞ CINEMATIC MODE';
       btn.style.color       = 'var(--neon-blue)';
-      btn.style.borderColor = 'rgba(0,212,255,0.4)';
+      btn.style.borderColor = 'rgba(200,17,85,0.4)';
     }
 
-    // Dashboard is dark.
-    try { document.body.classList.add('dark-mode'); } catch (e) { /* ignore */ }
+    // Dashboard layout no longer forces a theme — current theme choice persists
+    // across layout switches (see toggleTheme()/applyThemeClasses() in extras.js).
 
     // Ensure quiz overlay is visible in dashboard again
     const quizOverlay = document.getElementById('quiz-overlay');

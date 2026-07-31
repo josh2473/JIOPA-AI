@@ -25,8 +25,8 @@ function launchFireworks() {
 
   const ctx    = canvas.getContext('2d');
   const colors = [
-    '#00d4ff', '#7b2fff', '#00ff88',
-    '#ff2d9b', '#ffd060', '#ff6b35', '#00ffea',
+    '#D6295C', '#C81155', '#D4A548',
+    '#5C8A5A', '#9C1D63', '#F0C75E', '#E8578A',
   ];
 
   /* Build 220 particles from center */
@@ -46,7 +46,7 @@ function launchFireworks() {
   }
 
   function drawFireworks() {
-    ctx.fillStyle = 'rgba(2,5,16,0.15)';
+    ctx.fillStyle = 'rgba(251,246,236,0.16)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let alive = false;
@@ -93,9 +93,9 @@ function triggerGlitch() {
   if (!dashImg) return;
 
   const glitches = [
-    'brightness(1.6) saturate(2)   hue-rotate(45deg)',
-    'brightness(0.5) saturate(0.5) hue-rotate(-30deg)',
-    'brightness(1.8) saturate(3)   contrast(2)',
+    'brightness(1.15) saturate(1.3) hue-rotate(12deg)',
+    'brightness(0.92) saturate(0.85) hue-rotate(-8deg)',
+    'brightness(1.2)  saturate(1.4) contrast(1.15)',
   ];
 
   let i = 0;
@@ -110,7 +110,7 @@ function triggerGlitch() {
 
       /* Restore correct mode-tinted filter */
       const c    = MODE_CONFIG[currentMode];
-      const base = `brightness(1.15) saturate(1.4) hue-rotate(${c.hue}deg) contrast(1.05)`;
+      const base = `brightness(1.02) saturate(1.05) hue-rotate(${c.hue}deg) contrast(1.02)`;
 
       dashImg.style.transition = 'filter 1s ease';
       dashImg.style.filter     = base;
@@ -118,8 +118,7 @@ function triggerGlitch() {
       if (cinImg) {
         cinImg.style.transition = 'filter 1s ease';
         cinImg.style.filter     =
-          `drop-shadow(0 0 40px rgba(${c.r},${c.g},${c.b},0.8))
-           drop-shadow(0 0 80px rgba(${c.r},${c.g},${c.b},0.4))
+          `drop-shadow(0 10px 24px rgba(${c.r},${c.g},${c.b},0.28))
            ${base}`;
       }
     }
@@ -209,11 +208,11 @@ function initAskBadge() {
       @keyframes askBounce {
         0%,100% {
           transform: translateX(-50%) translateY(0);
-          box-shadow: 0 0 20px rgba(0,212,255,0.5);
+          box-shadow: 0 4px 14px rgba(200,17,85,0.25);
         }
         50% {
           transform: translateX(-50%) translateY(-5px);
-          box-shadow: 0 0 35px rgba(0,212,255,0.9);
+          box-shadow: 0 8px 22px rgba(200,17,85,0.35);
         }
       }
       #ask-badge {
@@ -222,11 +221,12 @@ function initAskBadge() {
         left: 50%;
         transform: translateX(-50%);
         z-index: 300;
-        font-family: 'Orbitron', monospace;
-        font-size: 0.6rem;
-        letter-spacing: 0.18em;
-        color: #000;
-        background: linear-gradient(135deg, #00ffea, #00d4ff, #7b2fff);
+        font-family: 'Fredoka', 'Nunito', sans-serif;
+        font-weight: 600;
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        color: #FFF9EE;
+        background: linear-gradient(135deg, #D4A548, #C81155, #8A6E3F);
         padding: 7px 20px;
         border-radius: 30px;
         cursor: pointer;
@@ -286,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAvatarClick();
   initAskBadge();
   loadThemePreference();
+  initThemeToggle();
   initDebugPanel();
   initDraggableAiStatus();
   initDraggableCinematicSideToggle();
@@ -481,26 +482,48 @@ function initDraggableCinematicSideToggleElement(el) {
 
 
 
-/* Persisted theme preference */
-/* Persisted theme preference with OS fallback and cross-tab sync */
+/* THEME CYCLE — Classic (warm) -> Dusk (dark warm) -> Cyberpunk (neon) -> Classic
+   Never persisted: every fresh load always starts on Classic. */
+const THEME_SEQUENCE = ['classic', 'dusk', 'cyberpunk'];
+let currentTheme = 'classic';
+
+function applyThemeClasses() {
+  document.body.classList.remove('dark-mode', 'theme-cyberpunk');
+  if (currentTheme === 'dusk')      document.body.classList.add('dark-mode');
+  if (currentTheme === 'cyberpunk') document.body.classList.add('theme-cyberpunk');
+  updateThemeToggleUI();
+}
+
+function updateThemeToggleUI() {
+  const icons = { classic: '☀️', dusk: '🌙', cyberpunk: '⚡' };
+  const labels = { classic: 'Classic', dusk: 'Dusk', cyberpunk: 'Cyberpunk' };
+  const icon = icons[currentTheme];
+
+  ['theme-toggle', 'theme-toggle-cin'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.textContent = icon;
+    btn.title = `Theme: ${labels[currentTheme]} (click to switch)`;
+    btn.setAttribute('aria-pressed', currentTheme !== 'classic' ? 'true' : 'false');
+  });
+}
+
 function loadThemePreference() {
-  // Locked to dark for dashboard; cinematic removes the class when active.
-  userDarkMode = true;
-  document.body.classList.add('dark-mode');
+  // Always start fresh on Classic — no persistence by design.
+  currentTheme = 'classic';
+  applyThemeClasses();
 }
 
-
-
-// Toggle and persist the theme (removed: locked to dark mode)
 function toggleTheme() {
-  userDarkMode = true;
-  document.body.classList.add('dark-mode');
+  const idx = THEME_SEQUENCE.indexOf(currentTheme);
+  currentTheme = THEME_SEQUENCE[(idx + 1) % THEME_SEQUENCE.length];
+  applyThemeClasses();
 }
-
-
 
 function initThemeToggle() {
-  // Light mode toggle removed.
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.onclick = toggleTheme;
+  updateThemeToggleUI();
 }
 
 
@@ -516,10 +539,10 @@ function initDebugPanel() {
     s.id = 'gemini-debug-style';
     s.textContent = `
       #gemini-debug-panel { position: fixed; right: 18px; bottom: 18px; width: 420px; height: 260px; z-index: 99998;
-        background: rgba(2,10,28,0.95); color: #bfeaff; border: 1px solid var(--neon-blue); padding: 10px; overflow: auto;
-        font-family: 'Share Tech Mono', monospace; font-size: 12px; border-radius: 8px; display: none; white-space: pre-wrap;
+        background: rgba(255,251,244,0.97); color: #2B2420; border: 1px solid var(--neon-blue); padding: 10px; overflow: auto;
+        font-family: 'Nunito', monospace; font-size: 12px; border-radius: 8px; display: none; white-space: pre-wrap;
       }
-      #debug-toggle { width:40px; height:28px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:var(--neon-blue); cursor:pointer }
+      #debug-toggle { width:40px; height:28px; border-radius:6px; border:1px solid rgba(200,17,85,0.2); background:rgba(200,17,85,0.06); color:var(--neon-blue); cursor:pointer }
     `;
     document.head.appendChild(s);
   }

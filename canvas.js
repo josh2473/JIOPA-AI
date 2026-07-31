@@ -299,8 +299,8 @@ function initMiniDNA() {
       const x1 = c.width / 2 + Math.cos(ph) * 15;
       const x2 = c.width / 2 + Math.cos(ph + Math.PI) * 15;
       ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y);
-      ctx.strokeStyle = 'rgba(0,212,255,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
-      [[x1, '#00d4ff'], [x2, '#7b2fff']].forEach(([x, col]) => {
+      ctx.strokeStyle = 'rgba(200,17,85,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
+      [[x1, '#C81155'], [x2, '#8A6E3F']].forEach(([x, col]) => {
         ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2);
         ctx.fillStyle = col; ctx.fill();
       });
@@ -330,14 +330,14 @@ function initMiniNeural() {
           layers[li + 1].forEach(b => {
             const gw = (Math.sin(p + li * 1.2) + 1) / 2;
             ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(0,212,255,${0.1 + gw * 0.22})`; ctx.lineWidth = 0.8; ctx.stroke();
+            ctx.strokeStyle = `rgba(200,17,85,${0.1 + gw * 0.22})`; ctx.lineWidth = 0.8; ctx.stroke();
           });
         });
       }
       layer.forEach(n => {
         const gw = (Math.sin(p + li * 0.8) + 1) / 2;
         ctx.beginPath(); ctx.arc(n.x, n.y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(123,47,255,${0.4 + gw * 0.6})`; ctx.fill();
+        ctx.fillStyle = `rgba(138,110,63,${0.4 + gw * 0.6})`; ctx.fill();
       });
     });
     requestAnimationFrame(draw);
@@ -357,8 +357,8 @@ function initMiniWave() {
       const y = c.height / 2 + Math.sin((x / c.width) * Math.PI * 4 + t * 0.1) * 12;
       x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = '#00ffea'; ctx.lineWidth = 1.5;
-    ctx.shadowColor = '#00ffea'; ctx.shadowBlur = 5; ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#C81155'; ctx.lineWidth = 1.5;
+    ctx.shadowColor = '#C81155'; ctx.shadowBlur = 5; ctx.stroke(); ctx.shadowBlur = 0;
     t++; requestAnimationFrame(draw);
   })();
 }
@@ -412,7 +412,7 @@ function initMiniCircuit() {
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.beginPath(); ctx.moveTo(path[0].x, path[0].y);
     path.forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.strokeStyle = 'rgba(0,212,255,0.4)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.strokeStyle = 'rgba(200,17,85,0.4)'; ctx.lineWidth = 1.5; ctx.stroke();
     pos = (pos + 0.008) % 1;
     const seg  = Math.floor(pos * (path.length - 1));
     const frac = (pos * (path.length - 1)) % 1;
@@ -421,7 +421,7 @@ function initMiniCircuit() {
       const px = a.x + (b.x - a.x) * frac;
       const py = a.y + (b.y - a.y) * frac;
       ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#00ffea'; ctx.shadowColor = '#00ffea'; ctx.shadowBlur = 8;
+      ctx.fillStyle = '#C81155'; ctx.shadowColor = '#C81155'; ctx.shadowBlur = 8;
       ctx.fill(); ctx.shadowBlur = 0;
     }
     requestAnimationFrame(draw);
@@ -440,16 +440,16 @@ function initMiniAtom() {
     [[1,0,0.03],[0,1,0.05],[0.7,0.7,0.04]].forEach((o, i) => {
       ctx.beginPath();
       ctx.ellipse(cx, cy, 38*o[0]+8, 38*o[1]+8, i*Math.PI/3, 0, Math.PI*2);
-      ctx.strokeStyle = 'rgba(0,212,255,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
+      ctx.strokeStyle = 'rgba(200,17,85,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
       const a  = t * o[2] * 10 + i * Math.PI * 0.66;
       const ex = cx + Math.cos(a) * (38*o[0]+8);
       const ey = cy + Math.sin(a) * (38*o[1]+8);
       ctx.beginPath(); ctx.arc(ex, ey, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#00ffea'; ctx.shadowColor = '#00ffea'; ctx.shadowBlur = 8;
+      ctx.fillStyle = '#C81155'; ctx.shadowColor = '#C81155'; ctx.shadowBlur = 8;
       ctx.fill(); ctx.shadowBlur = 0;
     });
     ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-    ctx.fillStyle = '#ff6060'; ctx.shadowColor = '#ff6060'; ctx.shadowBlur = 10;
+    ctx.fillStyle = '#D6295C'; ctx.shadowColor = '#D6295C'; ctx.shadowBlur = 10;
     ctx.fill(); ctx.shadowBlur = 0;
     t++; requestAnimationFrame(draw);
   })();
@@ -527,7 +527,7 @@ function runModalSolar(ctx, c) {
     ctx.clearRect(0, 0, c.width, c.height);
     pl.forEach(p => {
       ctx.beginPath(); ctx.arc(cx, cy, p.orb, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(0,212,255,0.08)'; ctx.lineWidth = 0.5; ctx.stroke();
+      ctx.strokeStyle = 'rgba(200,17,85,0.08)'; ctx.lineWidth = 0.5; ctx.stroke();
     });
     const sg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
     sg.addColorStop(0, '#fffbe0'); sg.addColorStop(0.5, '#ffd060'); sg.addColorStop(1, '#ff8800');
@@ -571,9 +571,9 @@ function runModalDNA(ctx, c) {
         const px2 = c.width/2 + Math.cos(pph+Math.PI)*amp;
         const py  = ((i-1)/30)*c.height;
         ctx.beginPath(); ctx.moveTo(px1,py); ctx.lineTo(x1,y);
-        ctx.strokeStyle=`rgba(0,212,255,${al})`; ctx.lineWidth=2.5; ctx.stroke();
+        ctx.strokeStyle=`rgba(200,17,85,${al})`; ctx.lineWidth=2.5; ctx.stroke();
         ctx.beginPath(); ctx.moveTo(px2,py); ctx.lineTo(x2,y);
-        ctx.strokeStyle=`rgba(123,47,255,${al})`; ctx.lineWidth=2.5; ctx.stroke();
+        ctx.strokeStyle=`rgba(138,110,63,${al})`; ctx.lineWidth=2.5; ctx.stroke();
       }
       ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y);
       ctx.strokeStyle='rgba(200,220,255,0.18)'; ctx.lineWidth=1; ctx.stroke();
@@ -610,7 +610,7 @@ function runModalNeural(ctx, c) {
       layer.forEach(a => byL[li+1].forEach(b => {
         const w = (Math.sin(pulse + li * 1.5) + 1) / 2;
         ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-        ctx.strokeStyle = `rgba(0,212,255,${0.06 + w*0.2})`; ctx.lineWidth = 0.8; ctx.stroke();
+        ctx.strokeStyle = `rgba(200,17,85,${0.06 + w*0.2})`; ctx.lineWidth = 0.8; ctx.stroke();
       }));
     });
     nodes.forEach(n => {
@@ -649,7 +649,7 @@ function runModalWave(ctx, c) {
       }
       ctx.strokeStyle=`rgba(${w.col},0.85)`; ctx.lineWidth=2;
       ctx.shadowColor=`rgba(${w.col},0.5)`; ctx.shadowBlur=8; ctx.stroke(); ctx.shadowBlur=0;
-      ctx.fillStyle=`rgba(${w.col},0.8)`; ctx.font='11px Share Tech Mono';
+      ctx.fillStyle=`rgba(${w.col},0.8)`; ctx.font='11px Nunito, sans-serif';
       ctx.textAlign='left'; ctx.fillText(w.lab, 8, c.height/2+(wi-1)*80-12);
     });
     t++; modalAnim = requestAnimationFrame(draw);
@@ -662,11 +662,11 @@ function runModalGravity(ctx, c) {
     { x:c.width/2,       y:c.height/2,       vx:0,    vy:0,    m:20, r:14, color:'#ffd060', name:'Star'     },
     { x:c.width/2+120,   y:c.height/2,       vx:0,    vy:1.8,  m:5,  r:7,  color:'#4080ff', name:'Planet A' },
     { x:c.width/2-80,    y:c.height/2+60,    vx:1.2,  vy:-1.5, m:3,  r:5,  color:'#ff4040', name:'Planet B' },
-    { x:c.width/2+40,    y:c.height/2-130,   vx:-1.5, vy:-0.8, m:2,  r:4,  color:'#00ff88', name:'Moon'     },
+    { x:c.width/2+40,    y:c.height/2-130,   vx:-1.5, vy:-0.8, m:2,  r:4,  color:'#5C8A5A', name:'Moon'     },
   ];
   const trails = bodies.map(() => []);
   (function draw() {
-    ctx.fillStyle='rgba(2,5,16,0.15)'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='rgba(251,246,236,0.16)'; ctx.fillRect(0,0,c.width,c.height);
     for (let i = 1; i < bodies.length; i++) {
       bodies[i].ax = 0; bodies[i].ay = 0;
       for (let j = 0; j < bodies.length; j++) {
@@ -708,35 +708,35 @@ function runModalCircuit(ctx, c) {
   const edges=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0],[1,5],[2,6],[3,7]];
   const comps=[{e:0,t:'R'},{e:2,t:'L'},{e:4,t:'C'},{e:6,t:'R'},{e:8,t:'LED'}];
   const pulses=edges.map(()=>({p:Math.random(),a:Math.random()>0.4}));
-  const cc={R:'#ff8c00',L:'#7b2fff',C:'#00d4ff',LED:'#00ff88'};
+  const cc={R:'#C4693B',L:'#8A6E3F',C:'#C81155',LED:'#5C8A5A'};
   (function draw() {
     ctx.clearRect(0,0,W,H);
     edges.forEach((e,ei)=>{
       const a=nodes[e[0]],b=nodes[e[1]];
       ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-      ctx.strokeStyle='rgba(0,212,255,0.28)'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.strokeStyle='rgba(200,17,85,0.28)'; ctx.lineWidth=1.5; ctx.stroke();
       if (pulses[ei].a) {
         pulses[ei].p=(pulses[ei].p+0.007)%1;
         const px=a.x+(b.x-a.x)*pulses[ei].p, py=a.y+(b.y-a.y)*pulses[ei].p;
         ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
-        ctx.fillStyle='#00ffea'; ctx.shadowColor='#00ffea'; ctx.shadowBlur=12;
+        ctx.fillStyle='#D4A548'; ctx.shadowColor='#D4A548'; ctx.shadowBlur=12;
         ctx.fill(); ctx.shadowBlur=0;
       }
     });
     comps.forEach(comp=>{
       const e=edges[comp.e],a=nodes[e[0]],b=nodes[e[1]];
       const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-      ctx.fillStyle='rgba(0,10,30,0.9)'; ctx.fillRect(mx-12,my-8,24,16);
+      ctx.fillStyle='rgba(255,251,244,0.95)'; ctx.fillRect(mx-12,my-8,24,16);
       ctx.strokeStyle=cc[comp.t]; ctx.lineWidth=1.5; ctx.strokeRect(mx-12,my-8,24,16);
       ctx.fillStyle=cc[comp.t]; ctx.font='bold 9px monospace';
       ctx.textAlign='center'; ctx.fillText(comp.t,mx,my+4);
     });
     nodes.forEach((n,ni)=>{
       ctx.beginPath(); ctx.arc(n.x,n.y,5,0,Math.PI*2);
-      const col=ni===0?'#ffd060':ni===4?'#ff4040':'#00d4ff';
+      const col=ni===0?'#D4A548':ni===4?'#D6295C':'#C81155';
       ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
     });
-    ctx.fillStyle='rgba(180,220,255,0.6)'; ctx.font='10px Share Tech Mono'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(122,53,80,0.7)'; ctx.font='10px Nunito, sans-serif'; ctx.textAlign='center';
     ctx.fillText('+ POWER',nodes[0].x,nodes[0].y-14);
     ctx.fillText('GROUND',nodes[4].x,nodes[4].y-14);
     modalAnim=requestAnimationFrame(draw);
@@ -747,9 +747,9 @@ function runModalCircuit(ctx, c) {
 function runModalAtom(ctx, c) {
   const cx=c.width/2, cy=c.height/2;
   const orbs=[
-    {a:100,b:40,  angle:0,          speed:0.018, color:'#00d4ff'},
-    {a:80, b:80,  angle:Math.PI/3,  speed:0.025, color:'#7b2fff'},
-    {a:40, b:100, angle:Math.PI*2/3,speed:0.015, color:'#00ff88'},
+    {a:100,b:40,  angle:0,          speed:0.018, color:'#C81155'},
+    {a:80, b:80,  angle:Math.PI/3,  speed:0.025, color:'#8A6E3F'},
+    {a:40, b:100, angle:Math.PI*2/3,speed:0.015, color:'#5C8A5A'},
   ];
   let t=0;
   (function draw() {

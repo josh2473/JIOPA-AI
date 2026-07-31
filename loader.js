@@ -114,7 +114,7 @@ function initSplashParticles() {
           ctx.beginPath();
           ctx.moveTo(sp[i].x, sp[i].y);
           ctx.lineTo(sp[j].x, sp[j].y);
-          ctx.strokeStyle = `rgba(0,212,255,${(1 - d / 100) * 0.12})`;
+          ctx.strokeStyle = `rgba(200,17,85,${(1 - d / 100) * 0.12})`;
           ctx.lineWidth   = 0.5;
           ctx.stroke();
         }
