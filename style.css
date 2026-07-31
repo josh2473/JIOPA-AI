@@ -751,6 +751,34 @@ body:hover #cin-side-toggle-web,
 }
 #cinematic.visible { display: flex; opacity: 1; }
 
+/* Back-to-dashboard button, only ever visible while cinematic is
+   active (it's a child of #cinematic so it hides/shows with it) */
+#layout-toggle-cin {
+  position: absolute;
+  top: 14px; left: 16px; z-index: 20;
+  padding: 7px 14px;
+  font-family: 'Fredoka', 'Nunito', sans-serif; font-size: .62rem; letter-spacing: .04em; font-weight: 600;
+  background: rgba(255,249,238,.9);
+  border: 1px solid rgba(200,17,85,.35); border-radius: 20px;
+  color: #9C1D63; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  transition: all .2s; white-space: nowrap;
+}
+#layout-toggle-cin:hover {
+  background: #FFF9EE;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+}
+body.dark-mode #layout-toggle-cin {
+  background: rgba(40,28,30,.92);
+  border-color: rgba(232,87,138,.5);
+  color: rgba(240,225,214,1);
+}
+body.theme-cyberpunk #layout-toggle-cin {
+  background: rgba(0,20,55,.85);
+  border-color: rgba(0,212,255,.5);
+  color: #00d4ff;
+}
+
 /* Full-screen avatar background */
 #cin-avatar-bg {
   position: absolute; inset: 0;
@@ -918,6 +946,56 @@ body.theme-cyberpunk .diff-btn,
 body.theme-cyberpunk #quiz-timer,
 body.theme-cyberpunk #quiz-score-display {
   font-family: 'Share Tech Mono', monospace;
+}
+
+/* ── Cyberpunk: extend the neon skin to Cinematic mode ── */
+body.theme-cyberpunk .cin-name {
+  color: #00d4ff;
+  text-shadow: 0 0 20px rgba(0,212,255,.6), 0 0 40px rgba(0,212,255,.3);
+  font-family: 'Orbitron', monospace;
+}
+body.theme-cyberpunk .cin-school,
+body.theme-cyberpunk .cin-tagline {
+  color: rgba(180,220,255,.85);
+}
+body.theme-cyberpunk .cin-section-title {
+  color: #00d4ff;
+  border-bottom-color: rgba(0,212,255,.3);
+}
+body.theme-cyberpunk #cin-input {
+  background: rgba(0,20,55,.6);
+  border-color: rgba(0,212,255,.3);
+  color: #e0f4ff;
+}
+body.theme-cyberpunk #cin-input::placeholder { color: rgba(180,220,255,.5); }
+body.theme-cyberpunk #cin-input:focus {
+  border-color: rgba(0,212,255,.6);
+  box-shadow: 0 0 0 3px rgba(0,212,255,.15);
+}
+body.theme-cyberpunk .cin-mode-btn {
+  background: rgba(0,20,55,.6);
+  border-color: rgba(0,212,255,.25);
+}
+body.theme-cyberpunk .cin-mode-btn:hover,
+body.theme-cyberpunk .cin-mode-btn.active {
+  border-color: rgba(0,212,255,.6);
+  background: rgba(0,40,80,.7);
+  box-shadow: 0 4px 16px rgba(0,212,255,.25);
+}
+body.theme-cyberpunk .cin-mode-name { color: rgba(180,220,255,.85); }
+body.theme-cyberpunk .cin-mode-btn.active .cin-mode-name { color: #00d4ff; }
+body.theme-cyberpunk #cin-stats {
+  background: rgba(0,20,55,.6);
+  border-color: rgba(0,212,255,.25);
+}
+body.theme-cyberpunk .cin-stat-val { color: #00ffea; }
+body.theme-cyberpunk #cin-mode-bar {
+  background: linear-gradient(0deg, rgba(2,5,16,.95), transparent);
+  color: rgba(180,220,255,.75);
+}
+body.theme-cyberpunk .cin-wave-bar {
+  background: #00d4ff;
+  box-shadow: 0 0 8px rgba(0,212,255,.6);
 }
 
 /* Theme toggle (icon-only) */
@@ -1769,6 +1847,62 @@ body.dark-mode #theme-toggle {
 #takeover-effect-close:hover { background: rgba(255,249,238,.95); }
 
 /* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER — SOLAR SYSTEM
+══════════════════════════════════════════════════ */
+#takeover-solar-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: radial-gradient(circle at 50% 50%, #0a0f2b 0%, #030510 70%);
+  opacity: 0; pointer-events: none; transition: opacity .4s ease;
+}
+#takeover-solar-overlay.open { opacity: 1; pointer-events: all; }
+#takeover-solar-canvas { width: 100%; height: 100%; display: block; }
+#takeover-solar-label {
+  position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+  font-family: 'Fredoka', 'Nunito', sans-serif; font-size: .78rem; font-weight: 700;
+  letter-spacing: .18em; color: rgba(224,244,255,.85);
+  text-shadow: 0 0 16px rgba(0,212,255,.5);
+}
+#takeover-solar-close {
+  position: absolute; top: 20px; right: 24px; z-index: 910;
+  width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+  color: #e0f4ff; font-size: 1.3rem; cursor: pointer;
+  border: 1px solid rgba(224,244,255,.35); border-radius: 50%;
+  background: rgba(0,0,0,.35);
+}
+#takeover-solar-close:hover { background: rgba(0,0,0,.55); }
+
+/* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER — TIME
+══════════════════════════════════════════════════ */
+#takeover-time-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: linear-gradient(135deg, #C81155, #9C1D63);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .4s ease;
+}
+#takeover-time-overlay.open { opacity: 1; pointer-events: all; }
+#takeover-time-clock {
+  font-family: 'Fredoka', 'Nunito', sans-serif; font-weight: 700;
+  font-size: clamp(3.2rem, 14vw, 9rem); letter-spacing: .04em;
+  color: #FFF9EE; text-shadow: 0 4px 24px rgba(0,0,0,.25);
+  line-height: 1;
+}
+#takeover-time-date {
+  margin-top: 12px;
+  font-family: 'Nunito', sans-serif; font-weight: 600;
+  font-size: clamp(.9rem, 2.4vw, 1.3rem); letter-spacing: .1em;
+  color: rgba(255,249,238,.85); text-transform: uppercase;
+}
+#takeover-time-close {
+  position: absolute; top: 20px; right: 24px; z-index: 910;
+  width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+  color: #FFF9EE; font-size: 1.3rem; cursor: pointer;
+  border: 1px solid rgba(255,249,238,.35); border-radius: 50%;
+  background: rgba(0,0,0,.2);
+}
+#takeover-time-close:hover { background: rgba(0,0,0,.35); }
+
+/* ══════════════════════════════════════════════════
    ASK ME ANYTHING BADGE (positioning lives here so it
    can be properly overridden per breakpoint)
 ══════════════════════════════════════════════════ */
@@ -1801,4 +1935,36 @@ body.dark-mode #theme-toggle {
     font-size: 0.56rem;
     padding: 6px 14px;
   }
+}
+
+/* ══════════════════════════════════════════════════
+   FUN EFFECTS — Screen Shake & Barrel Roll
+   Triggered from features.js via playScreenShake()
+   and playBarrelRoll(). Snow uses a plain canvas
+   (see #jiopa-snow-canvas, styled inline in JS).
+══════════════════════════════════════════════════ */
+@keyframes jiopaShake {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  10%  { transform: translate(-10px, -6px) rotate(-1deg); }
+  20%  { transform: translate(10px, 4px) rotate(1deg); }
+  30%  { transform: translate(-8px, 6px) rotate(-1deg); }
+  40%  { transform: translate(8px, -4px) rotate(1deg); }
+  50%  { transform: translate(-6px, 5px) rotate(-0.5deg); }
+  60%  { transform: translate(6px, -5px) rotate(0.5deg); }
+  70%  { transform: translate(-4px, 3px) rotate(-0.5deg); }
+  80%  { transform: translate(4px, -3px) rotate(0.5deg); }
+  90%  { transform: translate(-2px, 2px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+.jiopa-shake {
+  animation: jiopaShake 0.65s ease-in-out;
+}
+
+@keyframes jiopaBarrelRoll {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+body.jiopa-barrel-roll {
+  animation: jiopaBarrelRoll 3.6s ease-in-out 1;
+  transform-origin: 50% 50%;
 }

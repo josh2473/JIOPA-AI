@@ -228,12 +228,6 @@ function toggleLayout() {
       cin.classList.add('visible');
     }
 
-    if (btn) {
-      btn.textContent   = '⊟ DASHBOARD';
-      btn.style.color   = `rgb(${c.r},${c.g},${c.b})`;
-      btn.style.borderColor = `rgba(${c.r},${c.g},${c.b},0.5)`;
-    }
-
     // Cinematic layout no longer forces a theme — current theme choice persists
     // across layout switches (see toggleTheme()/applyThemeClasses() in extras.js).
 
@@ -272,11 +266,6 @@ function toggleLayout() {
     if (app) {
       app.style.display = 'grid';
       setTimeout(() => { app.classList.add('visible'); }, 20);
-    }
-    if (btn) {
-      btn.textContent       = '⊞ CINEMATIC';
-      btn.style.color       = 'var(--neon-blue)';
-      btn.style.borderColor = 'rgba(200,17,85,0.4)';
     }
 
     // Dashboard layout no longer forces a theme — current theme choice persists

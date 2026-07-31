@@ -175,6 +175,8 @@ function closeTakeover() {
   if (video) { video.pause(); video.src = ''; }
   if (overlay) overlay.classList.remove('open');
   stopTakeoverEffect();
+  stopSolarSystem();
+  stopTimeTakeover();
 }
 
 
@@ -265,6 +267,235 @@ function stopTakeoverEffect() {
 
 
 /* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER — SOLAR SYSTEM
+   Animated canvas: sun + orbiting planets, closes via
+   the same closeTakeover() as everything else.
+══════════════════════════════════════════════════ */
+let solarRAF = null;
+
+const SOLAR_PLANETS = [
+  { name: 'Mercury', radius: 4,  orbit: 55,  speed: 0.020, color: '#B5A697' },
+  { name: 'Venus',   radius: 7,  orbit: 80,  speed: 0.015, color: '#E8C27E' },
+  { name: 'Earth',   radius: 7.5,orbit: 108, speed: 0.012, color: '#4A90D9' },
+  { name: 'Mars',    radius: 5,  orbit: 132, speed: 0.010, color: '#C1440E' },
+  { name: 'Jupiter', radius: 16, orbit: 172, speed: 0.006, color: '#D9A066' },
+  { name: 'Saturn',  radius: 13, orbit: 210, speed: 0.0045,color: '#E3C88A' },
+  { name: 'Uranus',  radius: 10, orbit: 244, speed: 0.003, color: '#9FE3E0' },
+  { name: 'Neptune', radius: 9.5,orbit: 274, speed: 0.0022,color: '#4166F5' },
+];
+
+function playSolarSystem() {
+  const overlay = document.getElementById('takeover-solar-overlay');
+  const canvas = document.getElementById('takeover-solar-canvas');
+  if (!overlay || !canvas) return;
+
+  overlay.classList.add('open');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const scale = Math.min(1, (Math.min(canvas.width, canvas.height) * 0.42) / 274);
+
+  const angles = SOLAR_PLANETS.map(() => Math.random() * Math.PI * 2);
+
+  if (solarRAF) cancelAnimationFrame(solarRAF);
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Orbit rings
+    ctx.strokeStyle = 'rgba(224,244,255,.08)';
+    ctx.lineWidth = 1;
+    SOLAR_PLANETS.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, p.orbit * scale, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Sun
+    const sunR = 28 * scale;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, sunR * 2.4);
+    grad.addColorStop(0, 'rgba(255,220,120,1)');
+    grad.addColorStop(0.5, 'rgba(255,160,60,.55)');
+    grad.addColorStop(1, 'rgba(255,160,60,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, sunR * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FFD770';
+    ctx.beginPath();
+    ctx.arc(cx, cy, sunR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Planets
+    SOLAR_PLANETS.forEach((p, i) => {
+      angles[i] += p.speed;
+      const x = cx + Math.cos(angles[i]) * p.orbit * scale;
+      const y = cy + Math.sin(angles[i]) * p.orbit * scale * 0.55; // slight ellipse for perspective
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(x, y, p.radius * scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Saturn's ring
+      if (p.name === 'Saturn') {
+        ctx.strokeStyle = 'rgba(227,200,138,.7)';
+        ctx.lineWidth = 2 * scale;
+        ctx.beginPath();
+        ctx.ellipse(x, y, p.radius * scale * 1.9, p.radius * scale * 0.7, 0.4, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    });
+
+    solarRAF = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function stopSolarSystem() {
+  if (solarRAF) cancelAnimationFrame(solarRAF);
+  solarRAF = null;
+  const overlay = document.getElementById('takeover-solar-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+
+/* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER — TIME
+   Big live clock, auto-closes after 8 seconds (or
+   whenever the person closes it manually).
+══════════════════════════════════════════════════ */
+let timeTakeoverInterval = null;
+
+function playTimeTakeover() {
+  const overlay = document.getElementById('takeover-time-overlay');
+  const clockEl = document.getElementById('takeover-time-clock');
+  const dateEl  = document.getElementById('takeover-time-date');
+  if (!overlay || !clockEl || !dateEl) return;
+
+  function render() {
+    const now = new Date();
+    clockEl.textContent = now.toLocaleTimeString('en-GB', { hour12: false });
+    dateEl.textContent = now.toLocaleDateString('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+  }
+
+  render();
+  overlay.classList.add('open');
+
+  clearInterval(timeTakeoverInterval);
+  timeTakeoverInterval = setInterval(render, 1000);
+
+  clearTimeout(window._timeTakeoverTimeout);
+  window._timeTakeoverTimeout = setTimeout(closeTakeover, 8000);
+}
+
+function stopTimeTakeover() {
+  clearInterval(timeTakeoverInterval);
+  timeTakeoverInterval = null;
+  const overlay = document.getElementById('takeover-time-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+function playScreenShake() {
+  const target = isCinematic ? document.getElementById('cinematic') : document.getElementById('app');
+  if (!target) return;
+
+  target.classList.remove('jiopa-shake'); // restart if already running
+  // Force reflow so the animation restarts cleanly if triggered twice in a row
+  void target.offsetWidth;
+  target.classList.add('jiopa-shake');
+
+  clearTimeout(window._shakeTimeout);
+  window._shakeTimeout = setTimeout(() => {
+    target.classList.remove('jiopa-shake');
+  }, 700);
+}
+
+
+/* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER — BARREL ROLL
+   Classic "do a barrel roll" — spins the whole page
+   360° once, Google-search-easter-egg style.
+══════════════════════════════════════════════════ */
+function playBarrelRoll() {
+  document.body.classList.remove('jiopa-barrel-roll');
+  void document.body.offsetWidth;
+  document.body.classList.add('jiopa-barrel-roll');
+
+  clearTimeout(window._barrelRollTimeout);
+  window._barrelRollTimeout = setTimeout(() => {
+    document.body.classList.remove('jiopa-barrel-roll');
+  }, 4000);
+}
+
+
+/* ══════════════════════════════════════════════════
+   FULL-SCREEN TAKEOVER — SNOW
+   Google "let it snow" style falling-snow overlay.
+   Auto-clears after 8 seconds.
+══════════════════════════════════════════════════ */
+let snowRAF = null;
+
+function playSnowEffect() {
+  let canvas = document.getElementById('jiopa-snow-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'jiopa-snow-canvas';
+    canvas.style.position = 'fixed';
+    canvas.style.inset = '0';
+    canvas.style.zIndex = '5000';
+    canvas.style.pointerEvents = 'none';
+    document.body.appendChild(canvas);
+  }
+  canvas.style.display = 'block';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+
+  const flakes = [];
+  for (let i = 0; i < 120; i++) {
+    flakes.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 3 + 1.5,
+      speed: Math.random() * 1.5 + 0.6,
+      drift: Math.random() * 0.6 - 0.3,
+      alpha: Math.random() * 0.5 + 0.5,
+    });
+  }
+
+  if (snowRAF) cancelAnimationFrame(snowRAF);
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flakes.forEach(f => {
+      f.y += f.speed;
+      f.x += f.drift;
+      if (f.y > canvas.height) { f.y = -5; f.x = Math.random() * canvas.width; }
+      if (f.x > canvas.width) f.x = 0;
+      if (f.x < 0) f.x = canvas.width;
+
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${f.alpha})`;
+      ctx.fill();
+    });
+    snowRAF = requestAnimationFrame(loop);
+  }
+  loop();
+
+  clearTimeout(window._snowTimeout);
+  window._snowTimeout = setTimeout(() => {
+    if (snowRAF) cancelAnimationFrame(snowRAF);
+    snowRAF = null;
+    canvas.style.display = 'none';
+  }, 8000);
+}
+
+
+/* ══════════════════════════════════════════════════
    KEYWORD TRIGGER CHECK
    Call this BEFORE sending a message to getAIResponse().
    Returns true if a feature was triggered (caller should
@@ -297,12 +528,44 @@ function checkFeatureTriggers(text) {
     }
   }
 
-  // Effect takeover
-  if (TAKEOVER_TRIGGERS.effect.keywords.some(k => lower.includes(k))) {
-    addMsg('jiopa', '✨ Let\'s celebrate!');
-    playTakeoverEffect();
-    return true;
+  // Effect takeover — check each effect's own keyword set
+  for (const fx of TAKEOVER_TRIGGERS.effects) {
+    if (fx.keywords.some(k => lower.includes(k))) {
+      playEffectByType(fx.type, fx.label);
+      return true;
+    }
   }
 
   return false;
+}
+
+/* Dispatch an effect by type — called from checkFeatureTriggers() */
+function playEffectByType(type, label) {
+  switch (type) {
+    case 'shake':
+      addMsg('jiopa', '💥 Hold on tight!');
+      playScreenShake();
+      break;
+    case 'barrel-roll':
+      addMsg('jiopa', '🔄 Doing a barrel roll!');
+      playBarrelRoll();
+      break;
+    case 'snow':
+      addMsg('jiopa', '❄️ Let it snow!');
+      playSnowEffect();
+      break;
+    case 'solar-system':
+      addMsg('jiopa', '🪐 Here is our solar system!');
+      playSolarSystem();
+      break;
+    case 'time':
+      addMsg('jiopa', '🕐 Here is the time!');
+      playTimeTakeover();
+      break;
+    case 'confetti':
+    default:
+      addMsg('jiopa', '✨ Let\'s celebrate!');
+      playTakeoverEffect();
+      break;
+  }
 }

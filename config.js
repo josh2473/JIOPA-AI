@@ -289,11 +289,11 @@ const GALLERY_PHOTOS = [
   { src: 'gallery/photo11.jpg', caption: 'Career Day — students dressed as police officers on duty' },
 
   // ── PLACEHOLDERS — add real files to gallery/ then update the caption ──
-  { src: 'gallery/photo12.jpg', caption: 'Add photo12.jpg to gallery/ and update this caption' },
-  { src: 'gallery/photo13.jpg', caption: 'Add photo13.jpg to gallery/ and update this caption' },
-  { src: 'gallery/photo14.jpg', caption: 'Add photo14.jpg to gallery/ and update this caption' },
-  { src: 'gallery/photo15.jpg', caption: 'Add photo15.jpg to gallery/ and update this caption' },
-  { src: 'gallery/photo16.jpg', caption: 'Add photo16.jpg to gallery/ and update this caption' },
+  { src: 'gallery/photo12.jpg', caption: 'STEM Day — students demonstrating a circuit and coding project' },
+  { src: 'gallery/photo13.jpg', caption: 'STEM Day — working together to wire up the breadboard kit' },
+  { src: 'gallery/photo14.jpg', caption: 'STEM Day — testing their electronics project on the demo table' },
+  { src: 'gallery/photo15.jpg', caption: 'STEM Day — presenting their robotics and coding demo' },
+  { src: 'gallery/photo16.jpg', caption: 'STEM Day — students at the JIOPA School gate with their project' },
   { src: 'gallery/photo17.jpg', caption: 'Add photo17.jpg to gallery/ and update this caption' },
   { src: 'gallery/photo18.jpg', caption: 'Add photo18.jpg to gallery/ and update this caption' },
   { src: 'gallery/photo19.jpg', caption: 'Add photo19.jpg to gallery/ and update this caption' },
@@ -324,7 +324,7 @@ const TAKEOVER_TRIGGERS = {
     // ── PLACEHOLDERS — add the real .mp4 to video/, then set real
     //    keywords + label. Numbered keywords below just keep them
     //    from accidentally triggering before you customise them. ──
-    { keywords: ['play video 3'],  src: 'video/special-3.mp4',  label: 'Special Video 3' },
+    { keywords: ['robotics', 'stem project', 'circuit', 'coding demo', 'science fair'], src: 'video/special-3.mp4', label: 'STEM & Robotics Demo' },
     { keywords: ['play video 4'],  src: 'video/special-4.mp4',  label: 'Special Video 4' },
     { keywords: ['play video 5'],  src: 'video/special-5.mp4',  label: 'Special Video 5' },
     { keywords: ['play video 6'],  src: 'video/special-6.mp4',  label: 'Special Video 6' },
@@ -335,9 +335,38 @@ const TAKEOVER_TRIGGERS = {
     { keywords: ['play video 11'], src: 'video/special-11.mp4', label: 'Special Video 11' },
     { keywords: ['play video 12'], src: 'video/special-12.mp4', label: 'Special Video 12' },
   ],
-  effect: {
-    keywords: ['celebrate', 'special effect', 'party mode', 'surprise me'],
-  },
+  effects: [
+    {
+      type: 'confetti',
+      keywords: ['celebrate', 'special effect', 'party mode', 'surprise me'],
+      label: 'Celebration Confetti',
+    },
+    {
+      type: 'shake',
+      keywords: ['shake the screen', 'earthquake', 'shake it up', 'screen shake'],
+      label: 'Screen Shake',
+    },
+    {
+      type: 'barrel-roll',
+      keywords: ['do a barrel roll', 'barrel roll'],
+      label: 'Barrel Roll',
+    },
+    {
+      type: 'snow',
+      keywords: ['let it snow', 'snow mode', 'make it snow', 'snowfall'],
+      label: 'Snowfall',
+    },
+    {
+      type: 'solar-system',
+      keywords: ['solar system', 'the planets', 'show me the planets', 'planet model'],
+      label: 'Solar System',
+    },
+    {
+      type: 'time',
+      keywords: ['what is the time', "what's the time", 'what time is it', 'current time', 'tell me the time'],
+      label: 'Current Time',
+    },
+  ],
 };
 
 const GALLERY_TRIGGERS = ['show me photos', 'school gallery', 'pictures of jiopa', 'photo gallery', 'show gallery', 'jiopa photos'];
