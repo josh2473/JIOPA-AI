@@ -354,32 +354,53 @@ const TAKEOVER_TRIGGERS = {
   effects: [
     {
       type: 'confetti',
-      keywords: ['celebrate', 'special effect', 'party mode', 'surprise me'],
+      keywords: [
+        'celebrate', 'special effect', 'party mode', 'surprise me',
+        'confetti', 'party time', 'lets party', "let's party", 'celebration',
+      ],
       label: 'Celebration Confetti',
     },
     {
       type: 'shake',
-      keywords: ['shake the screen', 'earthquake', 'shake it up', 'screen shake'],
+      keywords: [
+        'shake the screen', 'earthquake', 'shake it up', 'screen shake',
+        'shake screen', 'shake my screen', 'shake it', 'shake the phone',
+        'shake the app', 'shake this',
+      ],
       label: 'Screen Shake',
     },
     {
       type: 'barrel-roll',
-      keywords: ['do a barrel roll', 'barrel roll'],
+      keywords: [
+        'do a barrel roll', 'barrel roll', 'barrel-roll', 'roll the screen',
+        'spin the screen', 'spin the page',
+      ],
       label: 'Barrel Roll',
     },
     {
       type: 'snow',
-      keywords: ['let it snow', 'snow mode', 'make it snow', 'snowfall'],
+      keywords: [
+        'let it snow', 'snow mode', 'make it snow', 'snowfall',
+        'show snow', 'snow effect', 'snowing', 'winter mode',
+      ],
       label: 'Snowfall',
     },
     {
       type: 'solar-system',
-      keywords: ['solar system', 'the planets', 'show me the planets', 'planet model'],
+      keywords: [
+        'solar system', 'the planets', 'show me the planets', 'planet model',
+        'show the solar system', 'show me the solar system', 'show planets',
+        'planets model', 'our solar system',
+      ],
       label: 'Solar System',
     },
     {
       type: 'time',
-      keywords: ['what is the time', "what's the time", 'what time is it', 'current time', 'tell me the time'],
+      keywords: [
+        'what is the time', "what's the time", 'whats the time',
+        'what time is it', 'current time', 'tell me the time',
+        'show me the time', 'show the time', 'time now', 'the time please',
+      ],
       label: 'Current Time',
     },
   ],
