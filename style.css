@@ -1640,13 +1640,17 @@ body.dark-mode #theme-toggle {
     margin-top: 0;
   }
 
-  /* Center panel: shrink avatar region and keep head area clear */
+  /* Center panel: shrink avatar region and keep head area clear.
+     The speech bubble is position:absolute and can grow to 2-3 lines,
+     so it needs a reserved zone above the avatar rather than just a
+     few px of padding — otherwise it overlaps the avatar's head. */
   #center-panel {
-    padding: 8px 0 0;
+    padding: 86px 12px 10px;
+    justify-content: flex-start;
   }
   #avatar-container {
-    width: min(72vw, 220px);
-    height: min(74vw, 230px);
+    width: min(68vw, 200px);
+    height: min(70vw, 210px);
     transform: none;
   }
   #speech-bubble {
@@ -1654,9 +1658,11 @@ body.dark-mode #theme-toggle {
     left: 50%;
     transform: translateX(-50%);
     max-width: 90%;
-    font-size: .72rem;
-    padding: 10px 14px;
+    font-size: .7rem;
+    padding: 8px 14px;
     border-radius: 16px;
+    max-height: 66px;
+    overflow: hidden;
   }
 
   /* Right panel: ensure chat area remains usable */
