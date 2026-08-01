@@ -36,6 +36,17 @@ function singAnthem(key) {
     ? data.audio[Math.floor(Math.random() * data.audio.length)]
     : data.audio;
 
+  // Guard against double-fallback: both the 'error' event AND a rejected
+  // play() promise can fire for the same failed audio load in some
+  // browsers, which without this guard starts two overlapping TTS
+  // narrations — reciting every sentence twice.
+  let fallbackStarted = false;
+  function fallbackToTTS() {
+    if (fallbackStarted) return;
+    fallbackStarted = true;
+    speakAnthemLines(data.lines);
+  }
+
   // Try real audio first.
   if (audioSrc) {
     const audio = new Audio(audioSrc);
@@ -45,21 +56,15 @@ function singAnthem(key) {
       setAIStatus('live');
     }, { once: true });
 
-    audio.addEventListener('error', () => {
-      // Audio file missing or failed to load — fall back to TTS.
-      speakAnthemLines(data.lines);
-    }, { once: true });
+    audio.addEventListener('error', fallbackToTTS, { once: true });
 
     audio.addEventListener('ended', () => {
       stopAnthem();
     }, { once: true });
 
-    audio.play().catch(() => {
-      // Autoplay blocked or file missing — fall back to TTS.
-      speakAnthemLines(data.lines);
-    });
+    audio.play().catch(fallbackToTTS);
   } else {
-    speakAnthemLines(data.lines);
+    fallbackToTTS();
   }
 }
 
@@ -158,6 +163,10 @@ function closeAnthemVisual() {
 function speakAnthemLines(lines) {
   if (muted || !synth) { closeAnthemVisual(); return; }
   setAIStatus('live');
+
+  // Cancel any speech already in progress before starting a new
+  // sequence — an extra safety net against overlapping narrations.
+  synth.cancel();
 
   let i = 0;
   function speakNext() {
@@ -664,6 +673,18 @@ function playSnowEffect() {
 function checkFeatureTriggers(text) {
   const lower = text.toLowerCase();
 
+  // Mini games
+  if (typeof checkGameTriggers === 'function' && checkGameTriggers(lower)) {
+    return true;
+  }
+
+  // Daily Challenge
+  const dailyChallengeKeywords = ['daily challenge', "today's challenge", 'daily quiz', 'challenge of the day'];
+  if (dailyChallengeKeywords.some(k => lower.includes(k))) {
+    openDailyChallenge();
+    return true;
+  }
+
   // Gallery
   if (GALLERY_TRIGGERS.some(k => lower.includes(k))) {
     addMsg('jiopa', 'Opening the JIOPA photo gallery for you!');
@@ -697,6 +718,255 @@ function checkFeatureTriggers(text) {
   }
 
   return false;
+}
+
+/* ══════════════════════════════════════════════════
+   DAILY CHALLENGE
+   Same question for everyone on a given calendar day
+   (date-seeded index into QUIZ_DATA). Each student can
+   only answer once per day — re-opening after answering
+   shows their result and a "come back tomorrow" message.
+   Storage is per-browser (localStorage-style via window
+   storage helpers already used elsewhere in the app).
+══════════════════════════════════════════════════ */
+const DAILY_CHALLENGE_KEY = 'jiopa-daily-challenge';
+const DAILY_CHALLENGE_NAME_KEY = 'jiopa-daily-challenge-name';
+const DAILY_CHALLENGE_STREAK_KEY = 'jiopa-daily-challenge-streak';
+
+function getStudentName() {
+  try {
+    return localStorage.getItem(DAILY_CHALLENGE_NAME_KEY) || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveStudentName(name) {
+  try {
+    localStorage.setItem(DAILY_CHALLENGE_NAME_KEY, name);
+  } catch (e) {
+    // localStorage unavailable — name just won't be remembered next visit.
+  }
+}
+
+function getStreakRecord() {
+  try {
+    const raw = localStorage.getItem(DAILY_CHALLENGE_STREAK_KEY);
+    return raw ? JSON.parse(raw) : { current: 0, longest: 0, lastDate: null };
+  } catch (e) {
+    return { current: 0, longest: 0, lastDate: null };
+  }
+}
+
+function saveStreakRecord(record) {
+  try {
+    localStorage.setItem(DAILY_CHALLENGE_STREAK_KEY, JSON.stringify(record));
+  } catch (e) {
+    // localStorage unavailable — streak just won't persist across visits.
+  }
+}
+
+/* Returns yesterday's date string in the same YYYY-MM-DD format as
+   getTodayDateString(), so we can check "did they play yesterday?" */
+function getYesterdayDateString() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/* Update the streak based on today's participation (answered, right or
+   wrong both count toward the streak — the goal is daily engagement,
+   not just correctness). Call this once per successful answer. */
+function updateStreak(today) {
+  const record = getStreakRecord();
+  const yesterday = getYesterdayDateString();
+
+  if (record.lastDate === today) {
+    // Already counted today somehow — don't double-increment.
+    return record;
+  }
+
+  if (record.lastDate === yesterday) {
+    record.current += 1;
+  } else {
+    record.current = 1;
+  }
+
+  record.longest = Math.max(record.longest, record.current);
+  record.lastDate = today;
+  saveStreakRecord(record);
+  return record;
+}
+
+function getTodayDateString() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+/* Simple deterministic hash so the same date always picks the same
+   question index, without needing a server or database. */
+function hashDateToIndex(dateStr, arrayLength) {
+  let hash = 0;
+  for (let i = 0; i < dateStr.length; i++) {
+    hash = (hash * 31 + dateStr.charCodeAt(i)) >>> 0;
+  }
+  return hash % arrayLength;
+}
+
+function getTodayChallengeQuestion() {
+  const today = getTodayDateString();
+  const idx = hashDateToIndex(today, QUIZ_DATA.length);
+  return { date: today, index: idx, question: QUIZ_DATA[idx] };
+}
+
+function getDailyChallengeRecord() {
+  try {
+    const raw = localStorage.getItem(DAILY_CHALLENGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveDailyChallengeRecord(record) {
+  try {
+    localStorage.setItem(DAILY_CHALLENGE_KEY, JSON.stringify(record));
+  } catch (e) {
+    // localStorage unavailable — challenge still works, just won't
+    // remember across page reloads for this session.
+  }
+}
+
+function openDailyChallenge() {
+  const overlay = document.getElementById('daily-challenge-overlay');
+  if (!overlay) return;
+
+  const studentName = getStudentName();
+  if (!studentName) {
+    showDailyChallengeNamePrompt(overlay);
+    return;
+  }
+
+  renderDailyChallengeQuestion(overlay, studentName);
+}
+
+/* First-visit-only name prompt, shown inside the same overlay. Once
+   submitted, the name is saved for this device and the actual
+   question is shown immediately after. */
+function showDailyChallengeNamePrompt(overlay) {
+  const qEl = document.getElementById('daily-challenge-question');
+  const optsEl = document.getElementById('daily-challenge-opts');
+  const resultEl = document.getElementById('daily-challenge-result');
+
+  if (qEl) qEl.textContent = "What's your name? We'll use it to track your daily streak!";
+  if (resultEl) resultEl.textContent = '';
+  if (optsEl) {
+    optsEl.style.display = 'flex';
+    optsEl.innerHTML = '';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Type your name...';
+    input.id = 'daily-challenge-name-input';
+    input.className = 'quiz-opt';
+    input.style.cursor = 'text';
+    optsEl.appendChild(input);
+
+    const submitBtn = document.createElement('div');
+    submitBtn.className = 'quiz-btn';
+    submitBtn.textContent = "Let's go!";
+    submitBtn.onclick = () => {
+      const name = input.value.trim();
+      if (!name) {
+        input.focus();
+        return;
+      }
+      saveStudentName(name);
+      renderDailyChallengeQuestion(overlay, name);
+    };
+    optsEl.appendChild(submitBtn);
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitBtn.click();
+    });
+    setTimeout(() => input.focus(), 100);
+  }
+
+  overlay.classList.add('open');
+}
+
+function renderDailyChallengeQuestion(overlay, studentName) {
+  const { date, index, question } = getTodayChallengeQuestion();
+  const record = getDailyChallengeRecord();
+  const alreadyAnswered = record && record.date === date;
+
+  const qEl = document.getElementById('daily-challenge-question');
+  const optsEl = document.getElementById('daily-challenge-opts');
+  const resultEl = document.getElementById('daily-challenge-result');
+
+  if (qEl) qEl.textContent = question.q;
+  if (resultEl) resultEl.textContent = '';
+  if (optsEl) optsEl.innerHTML = '';
+
+  overlay.classList.add('open');
+
+  if (alreadyAnswered) {
+    if (optsEl) optsEl.style.display = 'none';
+    const streak = getStreakRecord();
+    if (resultEl) {
+      resultEl.textContent = record.correct
+        ? `✅ ${studentName}, you already answered correctly today! Current streak: 🔥 ${streak.current} day${streak.current === 1 ? '' : 's'}. Come back tomorrow!`
+        : `${studentName}, you already tried today's challenge. The correct answer was "${question.opts[question.ans]}". Come back tomorrow for a new one!`;
+    }
+    addMsg('jiopa', `You have already completed today's Daily Challenge, ${studentName}. Come back tomorrow for a new one!`);
+    return;
+  }
+
+  if (optsEl) optsEl.style.display = 'flex';
+  addMsg('jiopa', `🌟 Here's today's Daily Challenge, ${studentName} — answer it to build your streak!`);
+
+  question.opts.forEach((opt, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => answerDailyChallenge(i, question, date, optsEl, resultEl, studentName);
+    if (optsEl) optsEl.appendChild(btn);
+  });
+}
+
+function answerDailyChallenge(chosenIndex, question, date, optsEl, resultEl, studentName) {
+  const correct = chosenIndex === question.ans;
+
+  saveDailyChallengeRecord({ date, correct, chosenIndex });
+  const streak = updateStreak(date);
+
+  if (optsEl) {
+    Array.from(optsEl.children).forEach((child, i) => {
+      if (i === question.ans) child.classList.add('correct');
+      else if (i === chosenIndex) child.classList.add('wrong');
+    });
+  }
+
+  const streakText = `🔥 ${streak.current}-day streak!${streak.current === streak.longest && streak.longest > 1 ? ' (Your best yet!)' : ''}`;
+
+  if (resultEl) {
+    resultEl.textContent = correct
+      ? `🎉 Correct, ${studentName}! ${streakText} Come back tomorrow for a new challenge.`
+      : `Not quite, ${studentName} — the correct answer was "${question.opts[question.ans]}". ${streakText} Come back tomorrow to try a new one!`;
+  }
+
+  addMsg('jiopa', correct
+    ? `🎉 Correct! ${streakText}`
+    : `Good try! The correct answer was "${question.opts[question.ans]}". ${streakText}`);
+
+  setTimeout(() => {
+    if (optsEl) optsEl.style.display = 'none';
+  }, 400);
+}
+
+function closeDailyChallenge() {
+  const overlay = document.getElementById('daily-challenge-overlay');
+  if (overlay) overlay.classList.remove('open');
 }
 
 /* Dispatch an effect by type — called from checkFeatureTriggers() */

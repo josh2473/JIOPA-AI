@@ -14,6 +14,11 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
+  // Interrupt any speech currently playing (TTS or anthem audio) so a new
+  // message doesn't have to wait for the previous one to finish.
+  if (typeof stopAnthem === 'function') stopAnthem();
+  if (synth) synth.cancel();
+
   input.value = '';
   addMsg('user', text);
   incrementQueryCount();
@@ -50,6 +55,11 @@ async function sendCinMessage() {
 
   const text = input.value.trim();
   if (!text) return;
+
+  // Interrupt any speech currently playing (TTS or anthem audio) so a new
+  // message doesn't have to wait for the previous one to finish.
+  if (typeof stopAnthem === 'function') stopAnthem();
+  if (synth) synth.cancel();
 
   input.value = '';
   addCinMsg('user', text);

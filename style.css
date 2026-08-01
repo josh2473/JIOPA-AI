@@ -2129,3 +2129,194 @@ body.jiopa-barrel-roll {
   animation: jiopaBarrelRoll 3.6s ease-in-out 1;
   transform-origin: 50% 50%;
 }
+/* ══════════════════════════════════════════════════
+   DAILY CHALLENGE
+══════════════════════════════════════════════════ */
+#daily-challenge-overlay {
+  position: fixed; inset: 0; z-index: 560;
+  background: rgba(43,36,32,.55);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+#daily-challenge-overlay.open { opacity: 1; pointer-events: all; }
+
+#daily-challenge-box {
+  width: min(92vw, 480px);
+  background: #FFFBF4;
+  border: 1px solid rgba(212,165,72,.4); border-radius: 18px;
+  padding: 24px; position: relative;
+  box-shadow: 0 14px 44px rgba(43,36,32,.18);
+  display: flex; flex-direction: column; gap: 12px;
+}
+#daily-challenge-title {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.05rem; font-weight: 700; color: var(--neon-purple);
+}
+#daily-challenge-subtitle {
+  font-size: .74rem; color: var(--text-dim); margin-top: -8px;
+}
+#daily-challenge-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 30px; height: 30px; cursor: pointer; font-size: 1.1rem;
+  color: var(--text-dim); display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(200,17,85,.2); border-radius: 8px; background: rgba(200,17,85,.05);
+}
+#daily-challenge-close:hover { color: var(--neon-blue); background: rgba(200,17,85,.12); }
+
+#daily-challenge-question {
+  font-size: .92rem; line-height: 1.55; color: var(--text-primary); font-weight: 600;
+}
+#daily-challenge-opts {
+  display: flex; flex-direction: column; gap: 8px;
+}
+#daily-challenge-result {
+  font-size: .8rem; line-height: 1.5; color: var(--text-primary);
+  min-height: 1.2em;
+}
+
+@media (max-width: 700px) {
+  #daily-challenge-box { width: 94vw; padding: 18px; }
+  #daily-challenge-title { font-size: .92rem; }
+  #daily-challenge-question { font-size: .84rem; }
+}
+
+/* Name input inside Daily Challenge (reuses .quiz-opt for consistent
+   look, but needs input-specific styling on top) */
+#daily-challenge-name-input {
+  font-family: 'Nunito', sans-serif;
+  font-size: .84rem;
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+}
+#daily-challenge-name-input::placeholder { color: var(--text-dim); }
+
+/* ══════════════════════════════════════════════════
+   MINI GAMES — SHARED OVERLAY/BOX STYLES
+══════════════════════════════════════════════════ */
+.game-overlay {
+  position: fixed; inset: 0; z-index: 570;
+  background: rgba(43,36,32,.55);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+.game-overlay.open { opacity: 1; pointer-events: all; }
+
+.game-box {
+  width: min(92vw, 520px); max-height: 88vh; overflow-y: auto;
+  background: #FFFBF4;
+  border: 1px solid rgba(200,17,85,.25); border-radius: 18px;
+  padding: 24px; position: relative;
+  box-shadow: 0 14px 44px rgba(43,36,32,.18);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.game-title {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.05rem; font-weight: 700; color: var(--neon-blue);
+}
+.game-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 30px; height: 30px; cursor: pointer; font-size: 1.1rem;
+  color: var(--text-dim); display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(200,17,85,.2); border-radius: 8px; background: rgba(200,17,85,.05);
+}
+.game-close:hover { color: var(--neon-blue); background: rgba(200,17,85,.12); }
+
+.game-stats-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'Nunito', sans-serif; font-weight: 700;
+  font-size: .82rem; color: var(--neon-purple);
+}
+.game-question {
+  font-size: 1.4rem; font-weight: 700; text-align: center;
+  color: var(--text-primary); padding: 10px 0;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+}
+.game-opts {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+.game-result {
+  font-size: .8rem; color: var(--text-primary); min-height: 1.2em; text-align: center;
+}
+
+/* ── MATH BLITZ ── */
+#mathblitz-timer { color: var(--neon-pink); }
+
+/* ── WORD SCRAMBLE ── */
+.scramble-letters {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.6rem; font-weight: 700; letter-spacing: .12em;
+  text-align: center; color: var(--neon-blue); padding: 12px 0;
+}
+.scramble-hint {
+  font-size: .78rem; color: var(--text-dim); text-align: center; font-style: italic;
+}
+.scramble-input-row {
+  display: flex; gap: 8px;
+}
+#scramble-input {
+  flex: 1;
+  background: #FFFDF8; border: 1px solid rgba(200,17,85,.3);
+  border-radius: 10px; padding: 9px 12px;
+  color: var(--text-primary); font-family: 'Nunito', sans-serif; font-size: .84rem;
+  outline: none;
+}
+#scramble-input:focus { border-color: rgba(200,17,85,.5); box-shadow: 0 0 0 3px rgba(200,17,85,.08); }
+
+/* ── MEMORY MATCH ── */
+.memory-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.memory-card {
+  aspect-ratio: 1 / 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; cursor: pointer;
+  background: #FFF9EE; border: 1px solid rgba(200,17,85,.25);
+  border-radius: 12px; transition: all .2s ease;
+  user-select: none;
+}
+.memory-card:hover { border-color: rgba(200,17,85,.5); background: #FDF0E4; }
+.memory-card.matched {
+  background: rgba(92,138,90,.14); border-color: var(--neon-green);
+  cursor: default;
+}
+
+/* ── ROBOT BUILDER ── */
+.robotbuilder-section-label {
+  font-family: 'Fredoka', 'Nunito', sans-serif; font-size: .68rem; font-weight: 600;
+  color: var(--neon-cyan); letter-spacing: .06em; margin-top: 4px;
+}
+.robotbuilder-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.robot-part-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 6px; cursor: pointer;
+  background: #FFF9EE; border: 1px solid rgba(200,17,85,.2);
+  border-radius: 12px; transition: all .2s ease; text-align: center;
+}
+.robot-part-btn:hover { border-color: rgba(200,17,85,.4); background: #FDF0E4; }
+.robot-part-btn.selected {
+  border-color: var(--neon-blue); background: rgba(200,17,85,.1);
+  box-shadow: 0 4px 12px rgba(200,17,85,.16);
+}
+.robot-part-icon { font-size: 1.3rem; }
+.robot-part-name { font-size: .58rem; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+
+.robotbuilder-result {
+  margin-top: 8px; padding: 14px;
+  background: rgba(212,165,72,.08); border: 1px solid rgba(212,165,72,.3);
+  border-radius: 12px; text-align: center;
+}
+.robot-preview { font-size: 2.2rem; margin-bottom: 8px; }
+.robot-description { font-size: .78rem; line-height: 1.5; color: var(--text-primary); }
+
+@media (max-width: 700px) {
+  .game-box { width: 94vw; padding: 16px; }
+  .game-title { font-size: .92rem; }
+  .game-question { font-size: 1.15rem; }
+  .memory-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .memory-card { font-size: 1.3rem; }
+  .robotbuilder-row { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .robot-part-name { font-size: .52rem; }
+}

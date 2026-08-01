@@ -265,6 +265,26 @@
       <div class="demo-label" style="font-size:1.3rem;position:static;">📷</div>
       <div class="demo-label">PHOTO GALLERY</div>
     </div>
+    <div class="demo-card" onclick="openDailyChallenge()" style="justify-content:center;">
+      <div class="demo-label" style="font-size:1.3rem;position:static;">🌟</div>
+      <div class="demo-label">DAILY CHALLENGE</div>
+    </div>
+    <div class="demo-card" onclick="openMathBlitz()" style="justify-content:center;">
+      <div class="demo-label" style="font-size:1.3rem;position:static;">⚡</div>
+      <div class="demo-label">MATH BLITZ</div>
+    </div>
+    <div class="demo-card" onclick="openWordScramble()" style="justify-content:center;">
+      <div class="demo-label" style="font-size:1.3rem;position:static;">🔤</div>
+      <div class="demo-label">WORD SCRAMBLE</div>
+    </div>
+    <div class="demo-card" onclick="openMemoryMatch()" style="justify-content:center;">
+      <div class="demo-label" style="font-size:1.3rem;position:static;">🧠</div>
+      <div class="demo-label">MEMORY MATCH</div>
+    </div>
+    <div class="demo-card" onclick="openRobotBuilder()" style="justify-content:center;">
+      <div class="demo-label" style="font-size:1.3rem;position:static;">🤖</div>
+      <div class="demo-label">ROBOT BUILDER</div>
+    </div>
   </div>
 
 </div><!-- /#app -->
@@ -409,6 +429,88 @@
 
 
 <!-- ═══════════════════════════════════
+     DAILY CHALLENGE
+═══════════════════════════════════ -->
+<div id="daily-challenge-overlay">
+  <div id="daily-challenge-box">
+    <div id="daily-challenge-close" onclick="closeDailyChallenge()">&#10005;</div>
+    <div id="daily-challenge-title">🌟 Daily Challenge</div>
+    <div id="daily-challenge-subtitle">One question a day — same for everyone at JIOPA!</div>
+    <div id="daily-challenge-question"></div>
+    <div id="daily-challenge-opts"></div>
+    <div id="daily-challenge-result"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     GAME: MATH BLITZ
+═══════════════════════════════════ -->
+<div id="mathblitz-overlay" class="game-overlay">
+  <div class="game-box">
+    <div class="game-close" onclick="closeMathBlitz()">&#10005;</div>
+    <div class="game-title">⚡ Math Blitz</div>
+    <div class="game-stats-row">
+      <div id="mathblitz-timer">30s</div>
+      <div id="mathblitz-score">Score: 0</div>
+    </div>
+    <div id="mathblitz-question" class="game-question"></div>
+    <div id="mathblitz-opts" class="game-opts"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     GAME: WORD SCRAMBLE
+═══════════════════════════════════ -->
+<div id="scramble-overlay" class="game-overlay">
+  <div class="game-box">
+    <div class="game-close" onclick="closeWordScramble()">&#10005;</div>
+    <div class="game-title">🔤 Word Scramble</div>
+    <div id="scramble-letters" class="scramble-letters"></div>
+    <div id="scramble-hint" class="scramble-hint"></div>
+    <div class="scramble-input-row">
+      <input type="text" id="scramble-input" placeholder="Type your answer..." autocomplete="off">
+      <div class="quiz-btn" onclick="checkScrambleAnswer()">Check</div>
+    </div>
+    <div id="scramble-result" class="game-result"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     GAME: MEMORY MATCH
+═══════════════════════════════════ -->
+<div id="memory-overlay" class="game-overlay">
+  <div class="game-box">
+    <div class="game-close" onclick="closeMemoryMatch()">&#10005;</div>
+    <div class="game-title">🧠 Memory Match</div>
+    <div id="memory-moves" class="game-stats-row">Moves: 0</div>
+    <div id="memory-grid" class="memory-grid"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     GAME: ROBOT BUILDER
+═══════════════════════════════════ -->
+<div id="robotbuilder-overlay" class="game-overlay">
+  <div class="game-box">
+    <div class="game-close" onclick="closeRobotBuilder()">&#10005;</div>
+    <div class="game-title">🤖 Robot Builder</div>
+    <div class="robotbuilder-section-label">Sensor</div>
+    <div id="robotbuilder-sensor" class="robotbuilder-row"></div>
+    <div class="robotbuilder-section-label">Motor</div>
+    <div id="robotbuilder-motor" class="robotbuilder-row"></div>
+    <div class="robotbuilder-section-label">Chassis</div>
+    <div id="robotbuilder-chassis" class="robotbuilder-row"></div>
+    <div id="robotbuilder-result" class="robotbuilder-result"></div>
+  </div>
+</div>
+
+
+
+<!-- ═══════════════════════════════════
      FULL-SCREEN TAKEOVER: VIDEO
 ═══════════════════════════════════ -->
 <div id="takeover-overlay">
@@ -505,6 +607,7 @@
 <script src="gemini.js"></script>
 <script src="chat.js"></script>
 <script src="features.js"></script>
+<script src="games.js"></script>
 <script src="modes.js"></script>
 <script src="canvas.js"></script>
 <script src="extras.js"></script>

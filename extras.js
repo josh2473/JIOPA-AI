@@ -184,6 +184,18 @@ function initAvatarClick() {
   if (!avatar) return;
 
   avatar.addEventListener('click', () => {
+    // If JIOPA AI is currently speaking (TTS or anthem audio), treat the
+    // click as a stop/interrupt instead of starting something new.
+    const isSpeaking = (synth && synth.speaking) ||
+                        (typeof anthemAudioEl !== 'undefined' && anthemAudioEl && !anthemAudioEl.paused);
+
+    if (isSpeaking) {
+      if (typeof stopAnthem === 'function') stopAnthem();
+      if (synth) synth.cancel();
+      setAIStatus('live');
+      return;
+    }
+
     const greeting = AVATAR_GREETINGS[
       Math.floor(Math.random() * AVATAR_GREETINGS.length)
     ];
