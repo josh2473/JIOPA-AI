@@ -160,7 +160,7 @@
     </div>
 
     <!-- SYSTEM STATUS WIDGETS -->
-    <div style="margin-top:auto;padding-top:6px;">
+    <div id="left-panel-status" style="margin-top:auto;padding-top:6px;">
       <div class="panel-title" style="margin-top:5px;">&#11041; System Status</div>
       <div class="mini-widget">
         <div class="widget-label">CPU LOAD</div>
@@ -443,6 +443,18 @@
   <div id="takeover-time-close" onclick="closeTakeover()">&#10005;</div>
   <div id="takeover-time-clock">--:--:--</div>
   <div id="takeover-time-date">--</div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     ANTHEM / PLEDGE VISUAL
+     Gallery slideshow while singing,
+     one static photo while reciting.
+═══════════════════════════════════ -->
+<div id="anthem-overlay">
+  <div id="anthem-overlay-close" onclick="stopAnthem()">&#10005;</div>
+  <img id="anthem-photo" alt="">
+  <div id="anthem-overlay-title"></div>
 </div>
 
 

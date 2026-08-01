@@ -15,6 +15,11 @@
    ANTHEM / PLEDGE / SCHOOL SONG
 ══════════════════════════════════════════════════ */
 let anthemAudioEl = null;
+let anthemSlideshowInterval = null;
+
+// Which anthem keys are SUNG (get a gallery slideshow) vs RECITED
+// (get a single static photo). Add new keys here as they're added.
+const ANTHEM_SUNG_KEYS = ['ghana', 'twi', 'school'];
 
 function singAnthem(key) {
   const data = ANTHEM_DATA[key];
@@ -23,9 +28,17 @@ function singAnthem(key) {
   addMsg('jiopa', `🎵 ${data.title}${data.subtitle ? ' — ' + data.subtitle : ''}`);
   setAIStatus('thinking');
 
+  showAnthemVisual(key, data);
+
+  // data.audio can be a single path or an array of paths — if it's an
+  // array, pick one at random each time the anthem is requested.
+  const audioSrc = Array.isArray(data.audio)
+    ? data.audio[Math.floor(Math.random() * data.audio.length)]
+    : data.audio;
+
   // Try real audio first.
-  if (data.audio) {
-    const audio = new Audio(data.audio);
+  if (audioSrc) {
+    const audio = new Audio(audioSrc);
     anthemAudioEl = audio;
 
     audio.addEventListener('canplaythrough', () => {
@@ -37,6 +50,10 @@ function singAnthem(key) {
       speakAnthemLines(data.lines);
     }, { once: true });
 
+    audio.addEventListener('ended', () => {
+      stopAnthem();
+    }, { once: true });
+
     audio.play().catch(() => {
       // Autoplay blocked or file missing — fall back to TTS.
       speakAnthemLines(data.lines);
@@ -46,13 +63,108 @@ function singAnthem(key) {
   }
 }
 
+/* Random transition presets for the slideshow — a different one is
+   picked each time a photo changes, for visual variety. */
+const SLIDESHOW_TRANSITIONS = [
+  { from: 'opacity:0; transform:scale(.92);',            to: 'opacity:1; transform:scale(1);' },            // zoom in
+  { from: 'opacity:0; transform:translateX(70px);',       to: 'opacity:1; transform:translateX(0);' },        // slide from right
+  { from: 'opacity:0; transform:translateX(-70px);',      to: 'opacity:1; transform:translateX(0);' },        // slide from left
+  { from: 'opacity:0; transform:translateY(50px);',       to: 'opacity:1; transform:translateY(0);' },        // slide from below
+  { from: 'opacity:0; transform:translateY(-50px);',      to: 'opacity:1; transform:translateY(0);' },        // slide from above
+  { from: 'opacity:0; transform:rotate(-4deg) scale(.94);', to: 'opacity:1; transform:rotate(0) scale(1);' }, // tilt in
+];
+
+function pickRandomTransition() {
+  return SLIDESHOW_TRANSITIONS[Math.floor(Math.random() * SLIDESHOW_TRANSITIONS.length)];
+}
+
+/* Show the gallery slideshow (sung anthems) or a single static
+   photo (recited pledge) behind/alongside the anthem playback. */
+function showAnthemVisual(key, data) {
+  const overlay = document.getElementById('anthem-overlay');
+  const img = document.getElementById('anthem-photo');
+  const titleEl = document.getElementById('anthem-overlay-title');
+  if (!overlay || !img) return;
+
+  if (titleEl) titleEl.textContent = data.title;
+  overlay.classList.add('open');
+
+  clearInterval(anthemSlideshowInterval);
+  anthemSlideshowInterval = null;
+
+  const isSung = ANTHEM_SUNG_KEYS.includes(key);
+
+  // Only ever show photos confirmed to actually load — filters out
+  // any missing/broken files from both the gallery and the slideshow.
+  getValidGalleryPhotos(validPhotos => {
+    if (isSung && validPhotos.length) {
+      startAnthemSlideshow(img, validPhotos);
+    } else {
+      // Recited (pledge) — one static photo, no cycling. If the
+      // configured photo is broken, fall back to the first valid one.
+      const preferred = data.photo && validPhotos.find(p => p.src === data.photo);
+      const staticSrc = (preferred && preferred.src) || (validPhotos[0] && validPhotos[0].src);
+      if (staticSrc) {
+        applyTransitionIn(img, pickRandomTransition(), staticSrc);
+      }
+    }
+  });
+}
+
+function startAnthemSlideshow(img, photos) {
+  let idx = Math.floor(Math.random() * photos.length);
+  applyTransitionIn(img, pickRandomTransition(), photos[idx].src);
+
+  const advance = () => {
+    idx = (idx + 1) % photos.length;
+    applyTransitionIn(img, pickRandomTransition(), photos[idx].src);
+  };
+
+  anthemSlideshowInterval = setInterval(advance, 3500);
+
+  // Safety net: if a cached-valid photo somehow still fails to render
+  // (e.g. file removed after the check), skip it immediately instead
+  // of leaving a broken image on screen.
+  img.onerror = () => {
+    clearInterval(anthemSlideshowInterval);
+    advance();
+    anthemSlideshowInterval = setInterval(advance, 3500);
+  };
+}
+
+/* Cross-fades/slides the anthem photo to a new src using the given
+   transition preset. */
+function applyTransitionIn(img, transition, newSrc) {
+  img.style.transition = 'none';
+  img.style.cssText += transition.from;
+  // Force reflow so the "from" state actually applies before we swap.
+  void img.offsetWidth;
+  img.src = newSrc;
+  img.style.transition = 'opacity .5s ease, transform .5s ease';
+  requestAnimationFrame(() => {
+    img.style.cssText += transition.to;
+  });
+}
+
+function closeAnthemVisual() {
+  const overlay = document.getElementById('anthem-overlay');
+  const img = document.getElementById('anthem-photo');
+  clearInterval(anthemSlideshowInterval);
+  anthemSlideshowInterval = null;
+  if (overlay) overlay.classList.remove('open');
+  if (img) img.onerror = null;
+}
+
 function speakAnthemLines(lines) {
-  if (muted || !synth) return;
+  if (muted || !synth) { closeAnthemVisual(); return; }
   setAIStatus('live');
 
   let i = 0;
   function speakNext() {
-    if (i >= lines.length) return;
+    if (i >= lines.length) {
+      closeAnthemVisual();
+      return;
+    }
     const utt = new SpeechSynthesisUtterance(lines[i]);
     utt.rate = 0.78;
     utt.pitch = 1.1;
@@ -76,6 +188,45 @@ function stopAnthem() {
     anthemAudioEl = null;
   }
   if (synth) synth.cancel();
+  closeAnthemVisual();
+}
+
+
+/* ══════════════════════════════════════════════════
+   PHOTO AVAILABILITY CHECK
+   Shared by the gallery grid and the anthem slideshow —
+   verifies each photo actually loads before it's shown,
+   so a missing/broken file never appears anywhere.
+══════════════════════════════════════════════════ */
+let validGalleryPhotosCache = null; // cached after first check this session
+
+function getValidGalleryPhotos(callback) {
+  if (validGalleryPhotosCache) {
+    callback(validGalleryPhotosCache);
+    return;
+  }
+  if (!GALLERY_PHOTOS.length) {
+    callback([]);
+    return;
+  }
+
+  let remaining = GALLERY_PHOTOS.length;
+  const results = new Array(GALLERY_PHOTOS.length);
+
+  GALLERY_PHOTOS.forEach((photo, idx) => {
+    const testImg = new Image();
+    testImg.onload = () => { results[idx] = photo; settle(); };
+    testImg.onerror = () => { results[idx] = null; settle(); };
+    testImg.src = photo.src;
+  });
+
+  function settle() {
+    remaining--;
+    if (remaining <= 0) {
+      validGalleryPhotosCache = results.filter(Boolean);
+      callback(validGalleryPhotosCache);
+    }
+  }
 }
 
 
@@ -83,6 +234,7 @@ function stopAnthem() {
    PHOTO GALLERY
 ══════════════════════════════════════════════════ */
 let galleryIndex = 0;
+let galleryPhotosShown = []; // the filtered, currently-displayed set
 
 function openGallery() {
   if (!GALLERY_PHOTOS.length) {
@@ -91,9 +243,17 @@ function openGallery() {
   }
   const overlay = document.getElementById('gallery-overlay');
   if (!overlay) return;
-  galleryIndex = 0;
-  renderGalleryGrid();
-  overlay.classList.add('open');
+
+  getValidGalleryPhotos(valid => {
+    galleryPhotosShown = valid;
+    if (!valid.length) {
+      addMsg('jiopa', 'The photo gallery is empty right now — photos will appear here once they are added.');
+      return;
+    }
+    galleryIndex = 0;
+    renderGalleryGrid();
+    overlay.classList.add('open');
+  });
 }
 
 function closeGallery() {
@@ -106,7 +266,7 @@ function renderGalleryGrid() {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
   grid.innerHTML = '';
-  GALLERY_PHOTOS.forEach((photo, idx) => {
+  galleryPhotosShown.forEach((photo, idx) => {
     const thumb = document.createElement('div');
     thumb.className = 'gallery-thumb';
     thumb.style.backgroundImage = `url('${photo.src}')`;
@@ -131,21 +291,21 @@ function closeGalleryLightbox() {
 function updateGalleryLightbox() {
   const img = document.getElementById('gallery-lightbox-img');
   const cap = document.getElementById('gallery-lightbox-caption');
-  const photo = GALLERY_PHOTOS[galleryIndex];
+  const photo = galleryPhotosShown[galleryIndex];
   if (!photo) return;
   if (img) img.src = photo.src;
   if (cap) cap.textContent = photo.caption || '';
 }
 
 function galleryNext() {
-  if (!GALLERY_PHOTOS.length) return;
-  galleryIndex = (galleryIndex + 1) % GALLERY_PHOTOS.length;
+  if (!galleryPhotosShown.length) return;
+  galleryIndex = (galleryIndex + 1) % galleryPhotosShown.length;
   updateGalleryLightbox();
 }
 
 function galleryPrev() {
-  if (!GALLERY_PHOTOS.length) return;
-  galleryIndex = (galleryIndex - 1 + GALLERY_PHOTOS.length) % GALLERY_PHOTOS.length;
+  if (!galleryPhotosShown.length) return;
+  galleryIndex = (galleryIndex - 1 + galleryPhotosShown.length) % galleryPhotosShown.length;
   updateGalleryLightbox();
 }
 

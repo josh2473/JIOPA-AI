@@ -212,7 +212,8 @@ const ANTHEM_DATA = {
   ghana: {
     title: 'National Anthem of Ghana',
     subtitle: '"God Bless Our Homeland Ghana"',
-    audio: 'audio/ghana-national-anthem.mp3',
+    // Two recordings — a random one plays each time the anthem is requested.
+    audio: ['audio/ghana-national-anthem.mp3', 'audio/ghana-national-anthem-alt.mp3'],
     lines: [
       'God bless our homeland Ghana,',
       'And make our nation great and strong,',
@@ -240,10 +241,25 @@ const ANTHEM_DATA = {
       'And under God march on for evermore.',
     ],
   },
+  twi: {
+    title: 'National Anthem of Ghana (Twi)',
+    subtitle: 'Twi-language rendition',
+    audio: 'audio/ghana-national-anthem-twi.mp3',
+    // TODO: add the Twi lyric lines here if you'd like TTS fallback text —
+    // left blank rather than guessed, since exact lyrics matter.
+    lines: [
+      'The Twi lyrics have not been added yet.',
+      'Ask Josh to provide the exact Twi anthem lyrics,',
+      'and I will be ready to sing along!',
+    ],
+  },
   pledge: {
     title: 'The National Pledge of Ghana',
     subtitle: 'Recited standing at attention, right hand over the heart',
     audio: 'audio/ghana-pledge.mp3',
+    // Static photo shown while the pledge is recited (no slideshow).
+    // Change this to any gallery/photoN.jpg path you prefer.
+    photo: 'gallery/photo4.jpg',
     lines: [
       'I promise on my honour',
       'to be faithful and loyal to Ghana my motherland.',
@@ -373,6 +389,7 @@ const GALLERY_TRIGGERS = ['show me photos', 'school gallery', 'pictures of jiopa
 
 const ANTHEM_TRIGGERS = {
   ghana:  ['sing the national anthem', 'ghana national anthem', 'sing ghana anthem'],
+  twi:    ['twi anthem', 'sing in twi', 'twi national anthem'],
   pledge: ['say the pledge', 'national pledge', 'recite the pledge'],
   school: ['sing the school anthem', 'jiopa anthem', 'school song'],
 };
