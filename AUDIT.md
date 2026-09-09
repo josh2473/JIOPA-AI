@@ -246,6 +246,66 @@ These are not code problems; they need content from you.
 
 ---
 
+## The cinematic layer
+
+Added after the first review pass, at Josh's request: something that
+actually stops people at an exhibition stand.
+
+`fx.js` is a real-time WebGL2 render pipeline, not CSS animation dressed up
+as one. Three passes:
+
+1. **Scene.** A raymarched volumetric field. Fractal Brownian motion builds a
+   nebula of drifting density, and three coloured lights orbit *inside* it, so
+   the light genuinely scatters through volume rather than being a gradient
+   painted on top. An infinite energy grid runs to a horizon underneath, with a
+   parallax starfield behind everything.
+2. **Bloom.** Bright pixels extracted at quarter resolution and blurred
+   separably, horizontally then vertically. This is what makes a light feel
+   physically hot rather than merely bright.
+3. **Composite.** Bloom added back, chromatic aberration that grows toward the
+   frame edges the way a real wide lens behaves, ACES filmic tonemapping,
+   animated grain, vignette, and a slow exposure pulse.
+
+Camera drift, light orbits, density and hue all run on periods chosen not to
+share a common multiple, so the screen is never the same twice.
+
+`titles.js` is the opening sequence: the wordmark assembles letter by letter
+out of depth and blur, a specular sweep crosses it, the tagline types itself
+in, and the button materialises. The letters are real DOM characters, so the
+type stays vector-sharp on a projector and a screen reader can still announce
+the school's name.
+
+Two bugs worth recording, because both are the kind that look like magic
+until you find them:
+
+- **The timeline ran in frame-units.** It accumulated Motion's `dt`, which is
+  deliberately clamped so a backgrounded tab cannot teleport a physics
+  simulation forward. Correct for the science lessons; wrong here — on a slow
+  first paint the whole sequence played in slow motion and the later scenes
+  never arrived. A title sequence runs on the clock on the wall.
+- **CSS transitions were eating the animation.** `#explore-btn` carries
+  `transition: all .25s`. The timeline wrote its opacity every frame, and each
+  write started a *fresh* 250ms transition from the current value — so with
+  frames 16ms apart it never got anywhere. The button sat at zero opacity
+  forever with a transition permanently one millisecond into its life. A
+  JS-driven animation and a CSS transition cannot both own the same property.
+
+The room also stays live behind the dashboard, which meant converting the app
+to dark glass under `[data-fx="on"]` — otherwise the spectacle lasted four
+seconds and then opaque paper panels covered it completely. That conversion
+had to name several ID selectors individually (`#center-panel` and friends
+hard-code `#FFFDF8`, which outranks any class-level override).
+
+**Gating.** High tier gets full resolution and 64 raymarch steps; mid tier
+0.7 resolution and 36. The low tier never starts the engine at all — nor does
+a browser without WebGL2, nor reduced-motion, nor `?fx=off` — and every one of
+those falls back to the original 2D particle splash and the warm paper theme.
+Once the child enters the app the room drops to ambient quality, because at
+that point it is scenery behind six panels rather than the subject. A child on
+a cheap phone in a classroom must still get a working app: the spectacle is
+never load-bearing.
+
+
 ## What is in this change
 
 | File | |
@@ -253,6 +313,9 @@ These are not code problems; they need content from you.
 | `motion.js` | **new** — single frame loop, device tiering, visibility pausing, canvas DPR fitting |
 | `explainers.js` | **new** — the seven lessons, rebuilt with labels, captions and legends |
 | `design.css` | **new** — three-layer token system, focus states, touch targets, tier degradation, mobile fixes |
+| `fx.js` | **new** — WebGL2 volumetric renderer: raymarched scene, bloom, chromatic aberration, ACES grade |
+| `titles.js` | **new** — the kinetic opening sequence |
+| `cinematic.css` | **new** — the room, the projection disc, and the dark-glass app treatment |
 | `AUDIT.md` | **new** — this document |
 | `canvas.js` | background and hair loops moved onto the motion engine; per-frame canvas resize removed |
 | `loader.js` | dead key-check calls removed; splash particles tier-scaled |

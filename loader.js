@@ -47,8 +47,17 @@ function showSplash() {
   const loader = document.getElementById('loader');
   if (loader) loader.classList.add('hidden');
 
-  // Start splash particle canvas
-  initSplashParticles();
+  /* Try to bring up the WebGL room first. It returns false on the
+     low tier, without WebGL2, under reduced-motion, or with
+     ?fx=off — in every one of those cases we fall back to the
+     original 2D particle splash, which has to keep working. */
+  const roomIsLive = FX.init(document.getElementById('fx-canvas'));
+
+  if (roomIsLive) {
+    Titles.play();
+  } else {
+    initSplashParticles();
+  }
 
   // The API keys now live on the server, so the browser genuinely
   // cannot know whether they are configured — the old
@@ -139,9 +148,18 @@ function initSplashParticles() {
 
 /* ── ENTER APP ── */
 function enterApp() {
-  // Hide splash
+  /* The splash pushes past the camera rather than fading, so it
+     reads as moving INTO the room instead of cutting to a
+     different screen. Titles.exit() falls back to a plain hide
+     when the room never started. */
   const splash = document.getElementById('splash');
-  if (splash) splash.classList.add('hidden');
+  if (FX.active) {
+    Titles.exit();
+    // The room stops being the subject and becomes scenery.
+    FX.setQuality('ambient');
+  } else if (splash) {
+    splash.classList.add('hidden');
+  }
 
   // Show dashboard
   const app = document.getElementById('app');

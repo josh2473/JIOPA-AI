@@ -25,6 +25,14 @@ function applyMode(mode) {
   document.documentElement.style.setProperty('--mode-g', c.g);
   document.documentElement.style.setProperty('--mode-b', c.b);
 
+  /* 1b. Re-light the volumetric room. The key light inside the
+     shader takes the mode colour, so switching from Science to
+     Robotics does not just recolour the panels — the light
+     genuinely travelling through the nebula changes with it. */
+  if (typeof FX !== 'undefined' && FX.active) {
+    FX.setKeyColor(c.r, c.g, c.b);
+  }
+
   /* 2. Mode flash overlay */
   const flash = document.getElementById('mode-flash');
   if (flash) {
@@ -38,7 +46,12 @@ function applyMode(mode) {
   const avatarImg = document.getElementById('avatar-img');
   if (avatarImg) {
     avatarImg.style.filter =
-      `brightness(1.02) saturate(1.05) hue-rotate(${c.hue}deg) contrast(1.02)`;
+      /* A full hue-rotate on a photograph of a person turns her
+         skin green in Science mode and orange in Robotics, which
+         is the first thing anyone notices and not in a good way.
+         Rotate a fraction of the way and let the surrounding room
+         carry the mode colour instead. */
+      `brightness(1.03) saturate(1.06) hue-rotate(${Math.round(c.hue * 0.22)}deg) contrast(1.02)`;
   }
 
   /* 4. Cinematic avatar image — includes soft glow in mode colour */
@@ -46,7 +59,7 @@ function applyMode(mode) {
   if (cinImg) {
     cinImg.style.filter =
       `drop-shadow(0 10px 24px rgba(${c.r},${c.g},${c.b},0.28))
-       brightness(1.02) saturate(1.05) hue-rotate(${c.hue}deg)`;
+       brightness(1.02) saturate(1.05) hue-rotate(${Math.round(c.hue * 0.22)}deg)`;
   }
 
   /* 5. Cinematic background tint */
