@@ -589,6 +589,7 @@ const FX = (() => {
   function supported() {
     if (Motion.tier === 'low' || Motion.reduced) return false;
     if (new URLSearchParams(location.search).get('fx') === 'off') return false;
+    if (new URLSearchParams(location.search).get('fx') === 'never') return false;
     try {
       const probe = document.createElement('canvas');
       return !!probe.getContext('webgl2');
@@ -613,10 +614,15 @@ const FX = (() => {
     if (!gl) { failed = true; return false; }
 
     // Tier settings.
+    /* Retuned after the first version was measurably slow to start on a
+       normal laptop. Full-resolution raymarching at 64 steps is a
+       benchmark setting, not a classroom one: the volume is soft and
+       low-frequency, so rendering it at 65% and upscaling is nearly
+       indistinguishable while costing well under half as much. */
     if (Motion.tier === 'high') {
-      renderScale = 1.0; steps = 64; bloomOn = true;
+      renderScale = 0.65; steps = 34; bloomOn = true;
     } else {
-      renderScale = 0.7; steps = 36; bloomOn = true;
+      renderScale = 0.5;  steps = 22; bloomOn = false;
     }
 
     progScene     = link(SCENE_FRAG);
@@ -684,9 +690,9 @@ const FX = (() => {
   function setQuality(mode) {
     if (!active) return;
     if (mode === 'ambient') {
-      steps = Motion.tier === 'high' ? 40 : 24;
+      steps = Motion.tier === 'high' ? 22 : 14;
     } else {
-      steps = Motion.tier === 'high' ? 64 : 36;
+      steps = Motion.tier === 'high' ? 34 : 22;
     }
   }
 

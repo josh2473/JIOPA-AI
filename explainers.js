@@ -1166,7 +1166,27 @@ const Explainers = (() => {
   };
 
 
-  const LESSONS = { solar, dna, neural, wave, gravity, circuit, atom };
+  /* Only two lessons are served from this file.
+
+     The rebuilt solar system, DNA, neural network, gravity and atom
+     were not an improvement in practice — they were busier and more
+     cluttered than the originals, and on a demo table busy loses to
+     clear. Those five go back to the original canvas.js versions
+     untouched. Circuit and sound wave stay here, because in those
+     two the rebuild added something the original did not have at
+     all: a switch that breaks the loop and kills the light, and a
+     longitudinal pressure wave rather than a decorative sine. */
+  const LESSONS = { wave, circuit };
+
+  /* The five reverted demos still live in canvas.js, under their own
+     names, never overridden. Dispatch straight to them. */
+  const ORIGINAL = {
+    solar:   { modal: 'runModalSolar',   mini: 'initMiniSolar'   },
+    dna:     { modal: 'runModalDNA',     mini: 'initMiniDNA'     },
+    neural:  { modal: 'runModalNeural',  mini: 'initMiniNeural'  },
+    gravity: { modal: 'runModalGravity', mini: 'initMiniGravity' },
+    atom:    { modal: 'runModalAtom',    mini: 'initMiniAtom'    },
+  };
 
 
   /* ═══════════════════════════════════════════════
@@ -1178,12 +1198,17 @@ const Explainers = (() => {
      instead of all seven burning frames forever.
   ═══════════════════════════════════════════════ */
   const MINI_IDS = {
-    solar: 'mini-solar', dna: 'mini-dna', neural: 'mini-neural',
-    wave: 'mini-wave', gravity: 'mini-gravity',
-    circuit: 'mini-circuit', atom: 'mini-atom',
+    wave: 'mini-wave',
+    circuit: 'mini-circuit',
   };
 
   function initMinis() {
+    // The five reverted demos run their original canvas.js setup.
+    Object.values(ORIGINAL).forEach(({ mini }) => {
+      const fn = window[mini];
+      if (typeof fn === 'function') fn();
+    });
+
     Object.entries(MINI_IDS).forEach(([key, id]) => {
       const canvas = document.getElementById(id);
       if (!canvas) return;
@@ -1236,6 +1261,11 @@ const Explainers = (() => {
   }
 
   function open(type) {
+    /* A reverted demo opens exactly the way it did before this
+       change: the plain modal, the original simulation, the original
+       description read aloud. No caption track, no legend. */
+    if (ORIGINAL[type]) return openOriginal(type);
+
     const lesson = LESSONS[type];
     if (!lesson) return;
 
@@ -1253,7 +1283,10 @@ const Explainers = (() => {
 
     // Legend.
     const legendEl = document.getElementById('lesson-legend');
+    const capEl    = document.getElementById('lesson-caption');
+    if (capEl) capEl.style.display = '';
     if (legendEl) {
+      legendEl.style.display = '';
       legendEl.innerHTML = '';
       lesson.legend.forEach(item => {
         const row = document.createElement('span');
@@ -1308,8 +1341,51 @@ const Explainers = (() => {
     }
   }
 
+  /* The original modal, restored verbatim from canvas.js. */
+  function openOriginal(type) {
+    close();
+
+    const modal = document.getElementById('modal');
+    if (modal) modal.classList.add('open');
+
+    const info = (typeof DEMO_INFO !== 'undefined' && DEMO_INFO[type]) || {};
+    const titleEl = document.getElementById('modal-title');
+    const descEl  = document.getElementById('modal-desc');
+    if (titleEl) titleEl.textContent = info.title || '';
+    if (descEl)  descEl.textContent  = info.desc  || '';
+
+    // Hide the lesson chrome — these demos do not use it.
+    const legendEl  = document.getElementById('lesson-legend');
+    const captionEl = document.getElementById('lesson-caption');
+    if (legendEl)  { legendEl.innerHTML = ''; legendEl.style.display = 'none'; }
+    if (captionEl) { captionEl.textContent = ''; captionEl.style.display = 'none'; }
+
+    const canvas = document.getElementById('modal-canvas');
+    if (!canvas) return;
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    if (typeof modalAnim !== 'undefined' && modalAnim) {
+      cancelAnimationFrame(modalAnim);
+      modalAnim = null;
+    }
+
+    const runner = window[ORIGINAL[type].modal];
+    if (typeof runner === 'function') runner(canvas.getContext('2d'), canvas);
+
+    if (info.desc && typeof speak === 'function') {
+      setTimeout(() => speak(info.desc), 500);
+    }
+  }
+
   function close() {
     Motion.unregister('lesson');
+
+    // The reverted demos drive their own rAF loop.
+    if (typeof modalAnim !== 'undefined' && modalAnim) {
+      cancelAnimationFrame(modalAnim);
+      modalAnim = null;
+    }
     if (activeLesson) {
       window.removeEventListener('resize', activeLesson.onResize);
       activeLesson = null;

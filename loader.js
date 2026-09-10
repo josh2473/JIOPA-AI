@@ -17,13 +17,17 @@ function bootLoader() {
   const bar    = document.getElementById('loader-bar');
   const status = document.getElementById('loader-status');
 
+  /* This bar is theatre: it is not measuring anything. It used to
+     tick every 170ms and take about 1.7 seconds to fill, which is
+     1.7 seconds of a child looking at a fake progress bar before the
+     app appears. Same look, roughly a third of the wait. */
   const interval = setInterval(() => {
-    pct += Math.random() * 14 + 5;
+    pct += Math.random() * 26 + 14;
 
     if (pct >= 100) {
       pct = 100;
       clearInterval(interval);
-      setTimeout(showSplash, 400);
+      setTimeout(showSplash, 180);
     }
 
     if (bar) bar.style.width = pct + '%';
@@ -37,7 +41,7 @@ function bootLoader() {
       sIdx = newIdx;
       if (status) status.textContent = LOADER_STATUSES[sIdx];
     }
-  }, 170);
+  }, 90);
 }
 
 
@@ -47,17 +51,17 @@ function showSplash() {
   const loader = document.getElementById('loader');
   if (loader) loader.classList.add('hidden');
 
-  /* Try to bring up the WebGL room first. It returns false on the
-     low tier, without WebGL2, under reduced-motion, or with
-     ?fx=off — in every one of those cases we fall back to the
-     original 2D particle splash, which has to keep working. */
-  const roomIsLive = FX.init(document.getElementById('fx-canvas'));
+  /* The WebGL room used to start here, and it made the app slow to
+     open on an ordinary laptop: compiling four shader programs and
+     raymarching a volume at full resolution, before the child has
+     even pressed a button, on the one screen where nothing is
+     happening yet.
 
-  if (roomIsLive) {
-    Titles.play();
-  } else {
-    initSplashParticles();
-  }
+     The room now belongs to cinematic mode — the full-screen
+     presentation view, which is where a moving volumetric
+     background is actually worth its cost. Startup is back to the
+     original lightweight particle splash. */
+  initSplashParticles();
 
   // The API keys now live on the server, so the browser genuinely
   // cannot know whether they are configured — the old
@@ -148,18 +152,8 @@ function initSplashParticles() {
 
 /* ── ENTER APP ── */
 function enterApp() {
-  /* The splash pushes past the camera rather than fading, so it
-     reads as moving INTO the room instead of cutting to a
-     different screen. Titles.exit() falls back to a plain hide
-     when the room never started. */
   const splash = document.getElementById('splash');
-  if (FX.active) {
-    Titles.exit();
-    // The room stops being the subject and becomes scenery.
-    FX.setQuality('ambient');
-  } else if (splash) {
-    splash.classList.add('hidden');
-  }
+  if (splash) splash.classList.add('hidden');
 
   // Show dashboard
   const app = document.getElementById('app');
