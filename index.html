@@ -5,7 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JIOPA AI — Future Classroom Assistant</title>
 <link rel="icon" type="image/jpeg" href="jiopa-logo.jpg">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Fonts, loaded WITHOUT blocking the first paint.
+
+     A plain <link rel="stylesheet"> to Google Fonts is render-blocking:
+     the browser will not paint anything until it comes back. On a fast
+     connection that is invisible. On a slow or flaky one — a school in
+     Accra, a phone on mobile data — the entire app sits on a blank
+     screen waiting for a font file from another continent. Measured in
+     a network-constrained environment it was the single largest cost at
+     startup by a wide margin, far more than any animation.
+
+     The media="print" trick lets the browser fetch it at low priority
+     without blocking, then swaps it to screen once it arrives. The
+     <noscript> copy keeps it working with JavaScript disabled, and the
+     preconnects shave a round trip off the handshake. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null"
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<noscript>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+</noscript>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="design.css">
 <link rel="stylesheet" href="cinematic.css">
@@ -608,7 +629,6 @@
 ═══════════════════════════════════ -->
 <script src="motion.js"></script>
 <script src="fx.js"></script>
-<script src="titles.js"></script>
 <script src="loader.js"></script>
 <script src="config.js"></script>
 <script src="state.js"></script>

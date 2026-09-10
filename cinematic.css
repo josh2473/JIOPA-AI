@@ -31,286 +31,14 @@ html[data-fx="on"] #fx-canvas {
   display: block;
 }
 
-/* When the room is live, the old 2D particle canvases would sit
-   on top of it as noise. Hide the splash one entirely and drop
-   the dashboard network to a faint overlay that reads as a data
-   layer above the volume rather than competing with it. */
-html[data-fx="on"] #splash-canvas {
-  display: none;
-}
+/* The 2D particle network would sit on top of the room as noise.
+   While the room is up it drops to a faint overlay that reads as a
+   data layer above the volume rather than competing with it. */
 html[data-fx="on"] #bg-canvas {
-  opacity: 0.4;
+  opacity: 0.35;
   mix-blend-mode: screen;
 }
 
-/* The room is dark, so the splash chrome has to be light on it
-   regardless of the app's paper theme. */
-html[data-fx="on"] #splash {
-  background: transparent;
-  color: #f4ece2;
-  perspective: 1400px;
-  perspective-origin: 50% 45%;
-}
-html[data-fx="on"] .splash-name,
-html[data-fx="on"] .splash-tagline,
-html[data-fx="on"] .splash-school,
-html[data-fx="on"] .explore-hint {
-  color: #f4ece2;
-  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.65);
-}
-
-
-/* ══════════════════════════════════════════════════
-   KINETIC TYPOGRAPHY
-══════════════════════════════════════════════════ */
-
-/* Each character is transformed independently in 3D, so it needs
-   its own layer and its own preserved perspective. */
-.kt-char {
-  display: inline-block;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  will-change: transform, opacity, filter;
-}
-.kt-space {
-  width: 0.32em;
-}
-
-.splash.kinetic .splash-name,
-#splash.kinetic .splash-name {
-  transform-style: preserve-3d;
-  position: relative;
-}
-
-/* The specular sweep. A moving highlight clipped to the glyphs
-   themselves — the reason the wordmark reads as a lit metal
-   surface rather than as flat coloured text. */
-#splash.kinetic .splash-name::after {
-  content: '';
-  position: absolute;
-  inset: -10% -20%;
-  pointer-events: none;
-  background: linear-gradient(
-    100deg,
-    transparent calc(var(--sweep, -60%) - 16%),
-    rgba(255, 255, 255, 0.92) var(--sweep, -60%),
-    transparent calc(var(--sweep, -60%) + 16%)
-  );
-  opacity: var(--sweep-alpha, 0);
-  mix-blend-mode: overlay;
-}
-
-/* ── HANDING CONTROL TO JAVASCRIPT ──
-   While the sequence is playing, JavaScript writes opacity and
-   transform on these elements every single frame. Two things in
-   the existing stylesheet fight that, and both have to be turned
-   off for the duration:
-
-   1. `transition`. #explore-btn carries `transition: all .25s`.
-      Every per-frame write starts a NEW 250ms transition from
-      wherever the value currently is — and since frames arrive
-      every 16ms, the value never gets anywhere. The button sat at
-      zero opacity forever, with a CSS transition permanently
-      one millisecond into its life. A JS-driven animation and a
-      CSS transition on the same property cannot both be in
-      charge.
-
-   2. `animation`. A running keyframe animation outranks an inline
-      style, so .explore-hint's infinite fadeUD simply ignored
-      everything the timeline asked for.
-
-   Both come back the moment the scripted part is over, under
-   .kinetic-done. */
-#splash.kinetic .splash-name,
-#splash.kinetic .splash-tagline,
-#splash.kinetic .splash-school,
-#splash.kinetic .explore-hint,
-#splash.kinetic .kt-char,
-#splash.kinetic .s-ring,
-#splash.kinetic #explore-btn {
-  transition: none !important;
-  animation: none;
-}
-
-#splash.kinetic .s-ring {
-  will-change: transform, opacity;
-}
-#splash.kinetic #explore-btn,
-#splash.kinetic .kt-char {
-  will-change: transform, opacity;
-}
-
-/* Once settled, the button gets its hover transition back — that
-   one is a response to the child, not a timeline. */
-#splash.kinetic-done #explore-btn {
-  transition: transform var(--dur-quick, 180ms) var(--ease-standard, ease),
-              box-shadow var(--dur-quick, 180ms) var(--ease-standard, ease),
-              background var(--dur-quick, 180ms) var(--ease-standard, ease) !important;
-  will-change: auto;
-}
-#splash.kinetic-done .explore-hint {
-  animation: fadeUD 2s ease-in-out infinite;
-}
-#splash.kinetic-done .kt-char {
-  will-change: auto;
-}
-
-/* Once the scripted sequence ends, hand the idle shimmer back to
-   CSS — a scripted frame loop for a screen that is just sitting
-   there is wasted budget. */
-#splash.kinetic-done .splash-name {
-  animation: wordmarkBreathe 6s var(--ease-standard, ease-in-out) infinite;
-}
-@keyframes wordmarkBreathe {
-  0%, 100% { transform: scale(1);      filter: brightness(1); }
-  50%      { transform: scale(1.014);  filter: brightness(1.13); }
-}
-
-#splash.kinetic-done .s-ring {
-  animation: ringDrift 7s ease-in-out infinite;
-}
-#splash.kinetic-done .s-ring.r2 { animation-delay: -2.3s; }
-#splash.kinetic-done .s-ring.r3 { animation-delay: -4.6s; }
-@keyframes ringDrift {
-  0%, 100% { transform: scale(0.92); opacity: 0.22; }
-  50%      { transform: scale(1.10); opacity: 0.55; }
-}
-
-/* The exit push. Transform and filter are driven from JS; this
-   only makes sure nothing clips the flight path. */
-#splash.exiting {
-  transform-style: preserve-3d;
-  will-change: transform, opacity, filter;
-}
-
-
-/* ══════════════════════════════════════════════════
-   THE PROJECTION DISC
-   ─────────────────────────────────────────────────
-   The avatar is a JPEG with a hard white background. Sitting on
-   the dark room it reads as a hole punched through the screen —
-   the one thing on the splash that looked pasted on.
-
-   It cannot be keyed out in CSS (the subject is nearly as light
-   as her background), so instead of hiding the brightness the
-   design commits to it: the disc becomes a holographic
-   projection. A conic rim light rotates around it, a soft bloom
-   spills outward, and fine scanlines pass across the surface.
-   The white stops being a mistake and becomes the projector beam.
-══════════════════════════════════════════════════ */
-html[data-fx="on"] .splash-avatar-wrap {
-  position: relative;
-  border-radius: 50%;
-  isolation: isolate;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.22),
-    0 0 60px 8px rgba(214, 41, 92, 0.30),
-    0 0 140px 20px rgba(120, 90, 220, 0.22);
-}
-
-/* Rotating rim light. */
-html[data-fx="on"] .splash-avatar-wrap::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 214, 130, 0.85) 55deg,
-    transparent 120deg,
-    transparent 200deg,
-    rgba(214, 41, 92, 0.85) 265deg,
-    transparent 330deg
-  );
-  animation: discOrbit 6.5s linear infinite;
-  z-index: -1;
-  filter: blur(5px);
-}
-@keyframes discOrbit {
-  to { transform: rotate(360deg); }
-}
-
-/* Scanlines and a vignette across the image itself, so the flat
-   white picks up the texture of a projected surface. */
-html[data-fx="on"] .splash-avatar-wrap::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(6, 10, 24, 0.16) 0px,
-      rgba(6, 10, 24, 0.16) 1px,
-      transparent 1px,
-      transparent 3px
-    ),
-    radial-gradient(
-      circle at 50% 42%,
-      transparent 48%,
-      rgba(8, 10, 26, 0.55) 88%,
-      rgba(8, 10, 26, 0.85) 100%
-    );
-  mix-blend-mode: multiply;
-  z-index: 2;
-}
-
-html[data-fx="on"] .splash-avatar-img {
-  filter: saturate(1.12) contrast(1.06) brightness(0.97);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-fx="on"] .splash-avatar-wrap::before { animation: none; }
-}
-
-
-/* ══════════════════════════════════════════════════
-   THE BUTTON
-   It is the one thing on the splash a child must find, so on the
-   dark room it gets a live edge rather than a flat fill.
-══════════════════════════════════════════════════ */
-html[data-fx="on"] #explore-btn {
-  position: relative;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  color: #fff;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  overflow: hidden;
-  box-shadow: 0 8px 40px rgba(184, 16, 74, 0.35);
-}
-html[data-fx="on"] #explore-btn::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 210, 120, 0.9) 40deg,
-    rgba(214, 41, 92, 0.9) 90deg,
-    transparent 150deg,
-    transparent 360deg
-  );
-  animation: edgeOrbit 3.4s linear infinite;
-  z-index: -1;
-}
-html[data-fx="on"] #explore-btn::after {
-  content: '';
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  background: rgba(8, 12, 24, 0.88);
-  z-index: -1;
-}
-@keyframes edgeOrbit {
-  to { transform: rotate(360deg); }
-}
-html[data-fx="on"] #explore-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 54px rgba(214, 41, 92, 0.55);
-}
 
 
 /* ══════════════════════════════════════════════════
@@ -350,198 +78,108 @@ html[data-fx="lost"] #splash-canvas {
 }
 
 
+
+
 /* ══════════════════════════════════════════════════
-   DARK GLASS — THE APP OVER THE ROOM
+   CINEMATIC MODE
    ─────────────────────────────────────────────────
-   The first version of this had a problem you could only see by
-   actually entering the app: the splash was spectacular, and then
-   the dashboard's opaque paper panels covered the room completely
-   and every bit of moving light was gone. The wow lasted four
-   seconds.
-
-   So when the room is live, the whole application becomes dark
-   glass. Panels are translucent, text is light, and the
-   volumetrics keep moving behind everything — through the chat,
-   behind the mode buttons, under the science thumbnails. The
-   light never stops changing, which was the point.
-
-   This only applies under [data-fx="on"]. On a phone, without
-   WebGL2, or with the effects turned off, the app keeps its
-   original warm paper look untouched.
+   This is the projector view, and it is where the volumetric room
+   now lives. `#cinematic` has no background of its own, so the
+   room simply shows through — but the avatar photograph fills the
+   whole frame at `inset: 0`, which would cover it. Grading that
+   photograph back into a lit backdrop is what makes the two read
+   as one scene instead of a picture with an animation behind it.
 ══════════════════════════════════════════════════ */
-html[data-fx="on"] body {
-  --surface-page:    transparent;
-  --surface-panel:   rgba(10, 14, 30, 0.62);
-  --surface-raised:  rgba(18, 24, 46, 0.72);
-  --surface-sunken:  rgba(6, 10, 22, 0.72);
-  --surface-overlay: rgba(3, 6, 14, 0.78);
 
-  --ink-strong: #f6f0e8;
-  --ink-body:   rgba(240, 232, 224, 0.90);
-  --ink-muted:  rgba(232, 220, 210, 0.68);
+/* The backdrop photograph.
 
-  --accent:      var(--c-crimson-300);
-  --accent-soft: rgba(214, 41, 92, 0.22);
+   Two earlier attempts made this worse, and both were the same
+   mistake: adding new layers to a layout I had not read closely
+   enough. A blend mode lifted the photo's white studio background
+   into glare; a scrim plus z-index rules then pushed the
+   foreground avatar over the entire interface.
 
-  --info:    var(--c-sky-300);
-  --success: var(--c-sage-300);
-  --warning: var(--c-gold-300);
-  --danger:  var(--c-crimson-300);
-
-  --border-subtle: rgba(255, 245, 235, 0.14);
-  --border-strong: rgba(255, 245, 235, 0.30);
-
-  --neon-blue:    var(--c-crimson-300);
-  --neon-cyan:    var(--c-magenta-400);
-  --neon-purple:  var(--c-gold-300);
-  --neon-green:   var(--c-sage-300);
-  --neon-pink:    var(--c-crimson-500);
-  --neon-orange:  var(--c-gold-500);
-  --dark-bg:      transparent;
-  --panel-bg:     var(--surface-panel);
-  --text-primary: var(--ink-strong);
-  --text-dim:     var(--ink-muted);
-
-  background: transparent;
-  color: var(--ink-body);
+   What actually works here is the smallest possible change. The
+   photo is simply exposed down so it stops competing with the
+   text, and left at that. No blend modes, no extra stacking
+   layers, no touching the z-order the original layout already
+   sets up. */
+html[data-fx="on"] #cin-avatar-bg {
+  filter: brightness(0.40) saturate(1.25) contrast(1.10);
 }
 
-/* The panels themselves. A translucent surface over moving
-   volumetrics needs a real border and a rim highlight, or it
-   reads as a smudge rather than as glass. */
-html[data-fx="on"] .panel,
-html[data-fx="on"] #modal-content,
-html[data-fx="on"] .msg,
-html[data-fx="on"] .demo-card,
-html[data-fx="on"] .mode-card {
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    0 18px 50px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(16px) saturate(1.25);
-  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+/* Type over a moving background needs its own separation or it
+   shimmers as the light passes behind it. */
+html[data-fx="on"] .cin-name {
+  color: #fff4f7;
+  text-shadow:
+    0 2px 40px rgba(0, 0, 0, 0.85),
+    0 0 90px rgba(214, 41, 92, 0.45);
 }
-
-html[data-fx="on"] .mode-card.active {
-  background: rgba(214, 41, 92, 0.24);
-  border-color: var(--c-crimson-300);
+html[data-fx="on"] .cin-school,
+html[data-fx="on"] .cin-tagline {
+  color: rgba(255, 236, 226, 0.82);
+  text-shadow: 0 1px 22px rgba(0, 0, 0, 0.9);
 }
-
-/* ── THE HARD-CODED PAPER COLOURS ──
-   Twenty-odd rules in style.css set #FFF9EE or a dark ink colour
-   literally rather than through a variable, so re-pointing the
-   tokens alone leaves the app half-converted: dark text on dark
-   glass, which is worse than either theme on its own. These are
-   the surfaces and inks that actually appear on the dashboard. */
-html[data-fx="on"] .mode-name,
-html[data-fx="on"] .cin-mode-name,
+html[data-fx="on"] #cin-speech {
+  color: #fff4f7;
+  background: rgba(8, 12, 26, 0.62);
+  border: 1px solid rgba(255, 245, 235, 0.16);
+  text-shadow: 0 1px 22px rgba(0, 0, 0, 0.9);
+}
+html[data-fx="on"] #cin-messages .msg {
+  color: #f2ece6;
+}
 html[data-fx="on"] .msg-sender {
-  color: var(--c-crimson-300);
+  color: #ffb3c8;
 }
-html[data-fx="on"] .mode-card.active .mode-name,
-html[data-fx="on"] .mode-card:hover .mode-name {
+
+/* The panels in cinematic mode become glass over the room. */
+html[data-fx="on"] #cin-chat-box,
+html[data-fx="on"] .cin-mode-btn,
+html[data-fx="on"] #cin-right,
+html[data-fx="on"] .msg {
+  background: rgba(8, 12, 26, 0.55);
+  border: 1px solid rgba(255, 245, 235, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 50px rgba(0, 0, 0, 0.5);
+  color: #f2ece6;
+}
+html[data-fx="on"] .cin-mode-btn.active {
+  background: rgba(214, 41, 92, 0.26);
+  border-color: rgba(247, 139, 171, 0.75);
+}
+html[data-fx="on"] .cin-mode-name,
+html[data-fx="on"] .cin-section-title {
   color: #ffd9e4;
 }
-html[data-fx="on"] .mode-desc,
-html[data-fx="on"] .widget-label,
-html[data-fx="on"] .panel-title,
-html[data-fx="on"] .stat-label {
-  color: var(--ink-muted);
-}
-html[data-fx="on"] .demo-label {
-  color: var(--c-gold-300);
-}
-html[data-fx="on"] .widget-value,
-html[data-fx="on"] .stat-value {
-  color: var(--ink-strong);
-}
-html[data-fx="on"] .msg-jiopa {
-  background: rgba(12, 18, 36, 0.66);
-  border-color: rgba(255, 245, 235, 0.16);
-  color: var(--ink-body);
-}
-html[data-fx="on"] .msg-user {
-  background: rgba(212, 165, 72, 0.22);
-  border-color: rgba(242, 215, 146, 0.45);
-  color: #fdf3dd;
-}
-html[data-fx="on"] .widget-bar {
-  background: rgba(255, 245, 235, 0.14);
-}
-html[data-fx="on"] .mini-widget {
-  background: rgba(6, 10, 22, 0.55);
-  border-color: var(--border-subtle);
-}
-html[data-fx="on"] .cin-mode-btn {
-  background: var(--surface-panel);
-  border-color: var(--border-subtle);
-}
-
-/* The four dashboard panels each set `background: #FFFDF8` on an
-   ID selector, which outranks any class-level override — so the
-   glass treatment landed on everything inside them while the
-   panels themselves stayed paper-white. They have to be named
-   individually to win. */
-html[data-fx="on"] #left-panel,
-html[data-fx="on"] #center-panel,
-html[data-fx="on"] #right-panel,
-html[data-fx="on"] #bottom-panel {
-  background: var(--surface-panel);
-}
-
-/* The avatar plate in the centre panel gets the same projection
-   treatment as the splash disc, so the two read as one idea. */
-html[data-fx="on"] #center-panel {
-  background:
-    radial-gradient(circle at 50% 38%, rgba(214, 41, 92, 0.14), transparent 62%),
-    var(--surface-panel);
-}
-
-html[data-fx="on"] #header {
-  border-color: var(--border-subtle);
-}
-
-html[data-fx="on"] #chat-input,
 html[data-fx="on"] #cin-input {
-  background: rgba(4, 8, 20, 0.6);
-  border: 1px solid var(--border-subtle);
-  color: var(--ink-strong);
+  background: rgba(4, 8, 20, 0.65);
+  border: 1px solid rgba(255, 245, 235, 0.16);
+  color: #f2ece6;
 }
-html[data-fx="on"] #chat-input::placeholder,
 html[data-fx="on"] #cin-input::placeholder {
-  color: var(--ink-muted);
+  color: rgba(240, 230, 222, 0.55);
 }
 
-/* The lesson caption sits on glass now, so it needs its own
-   readable plate rather than the pale pink one. */
-html[data-fx="on"] .lesson-caption {
-  background: rgba(214, 41, 92, 0.16);
-  color: var(--ink-strong);
-  border-left-color: var(--c-crimson-300);
+/* The hair canvas is drawn against a dark room now, so it can be
+   brighter without turning into a smear. */
+html[data-fx="on"] #cin-hair {
+  opacity: 0.85;
+  mix-blend-mode: screen;
 }
 
-/* Anything that painted itself a solid warm colour has to give
-   that up, or it punches an opaque hole in the glass. */
-html[data-fx="on"] #app,
-html[data-fx="on"] #header,
-html[data-fx="on"] #chat-messages,
-html[data-fx="on"] #demo-bar {
-  background: transparent;
-}
-
-/* Blur over a full-screen WebGL surface is the single most
-   expensive thing on this page. Phones and tablets get the glass
-   colour without the blur — it still reads as glass because the
-   room behind it is moving. */
+/* Phones: the room still renders, but compositing a blur over a
+   full-screen WebGL surface is where a mid-range Android falls
+   over, so the glass is a flat colour there. */
 @media (max-width: 900px), (pointer: coarse) {
-  html[data-fx="on"] .panel,
-  html[data-fx="on"] #modal-content,
-  html[data-fx="on"] .msg,
-  html[data-fx="on"] .demo-card,
-  html[data-fx="on"] .mode-card {
+  html[data-fx="on"] #cin-chat-box,
+  html[data-fx="on"] .cin-mode-btn,
+  html[data-fx="on"] #cin-right,
+  html[data-fx="on"] .msg {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(8, 12, 26, 0.86);
+    background: rgba(8, 12, 26, 0.85);
   }
 }

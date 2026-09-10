@@ -57,15 +57,26 @@ function applyMode(mode) {
   /* 4. Cinematic avatar image — includes soft glow in mode colour */
   const cinImg = document.getElementById('cin-avatar-img');
   if (cinImg) {
+    const roomUp = (typeof FX !== 'undefined' && FX.active);
     cinImg.style.filter =
       `drop-shadow(0 10px 24px rgba(${c.r},${c.g},${c.b},0.28))
-       brightness(1.02) saturate(1.05) hue-rotate(${Math.round(c.hue * 0.22)}deg)`;
+       brightness(${roomUp ? 0.86 : 1.02}) saturate(1.05) hue-rotate(${Math.round(c.hue * 0.22)}deg)`;
   }
 
-  /* 5. Cinematic background tint */
+  /* 5. Cinematic background tint.
+
+     This is set inline, which beats any stylesheet rule — so the
+     exposure for the WebGL room has to be decided here rather than
+     in CSS. With the room up, the backdrop photograph is pulled
+     down hard: it is a lit backdrop at that point, not the subject,
+     and at its normal brightness its white studio background washes
+     out the whole left-hand column. */
   const cinBg = document.getElementById('cin-avatar-bg');
   if (cinBg) {
-    cinBg.style.filter = `brightness(0.9) saturate(1.05) hue-rotate(${c.hue}deg)`;
+    const roomUp = (typeof FX !== 'undefined' && FX.active);
+    const bright = roomUp ? 0.34 : 0.9;
+    cinBg.style.filter =
+      `brightness(${bright}) saturate(1.15) hue-rotate(${Math.round(c.hue * 0.5)}deg)`;
   }
 
   /* 6. Energy rings — colour to match mode */
@@ -230,6 +241,23 @@ function toggleLayout() {
     // Ensure AI status is shown as live while cinematic is active
     setAIStatus('live');
 
+    /* Bring up the WebGL room. Cinematic mode is the full-screen
+       presentation view — the projector view — and it is the one
+       place in the app where a moving volumetric background earns
+       what it costs. It starts here rather than at page load, so
+       opening the app stays fast. */
+    if (typeof FX !== 'undefined') {
+      const fxCanvas = document.getElementById('fx-canvas');
+      if (FX.active) {
+        FX.setQuality('full');
+      } else if (FX.init(fxCanvas)) {
+        FX.setKeyColor(c.r, c.g, c.b);
+        // Re-run the mode so the backdrop exposure switches to its
+        // room-lit values — those are set inline, above.
+        applyMode(currentMode);
+      }
+    }
+
     /* Switch TO cinematic */
     if (app) {
       app.classList.remove('visible');
@@ -270,6 +298,13 @@ function toggleLayout() {
   } else {
     // Ensure AI status is shown as live while dashboard is active
     setAIStatus('live');
+
+    /* Leaving cinematic: shut the room down completely rather than
+       leaving it rendering behind an invisible layer. */
+    if (typeof FX !== 'undefined' && FX.active) {
+      FX.stop();
+      applyMode(currentMode);   // restore the un-graded backdrop
+    }
 
     /* Switch TO dashboard */
     if (cin) {
