@@ -525,13 +525,39 @@
   <div class="game-box">
     <div class="game-close" onclick="closeRobotBuilder()">&#10005;</div>
     <div class="game-title">🤖 Robot Builder</div>
+    <div id="robotbuilder-stage" class="robotbuilder-stage"></div>
     <div class="robotbuilder-section-label">Sensor</div>
     <div id="robotbuilder-sensor" class="robotbuilder-row"></div>
     <div class="robotbuilder-section-label">Motor</div>
     <div id="robotbuilder-motor" class="robotbuilder-row"></div>
     <div class="robotbuilder-section-label">Chassis</div>
     <div id="robotbuilder-chassis" class="robotbuilder-row"></div>
+    <div class="robotbuilder-controls">
+      <button type="button" class="robot-ctrl" onclick="randomiseRobot()">🎲 Surprise me</button>
+      <button type="button" class="robot-ctrl" onclick="resetRobotBuilder()">↺ Start over</button>
+    </div>
     <div id="robotbuilder-result" class="robotbuilder-result"></div>
+    <div id="robotcode-section" class="robotcode-section" hidden>
+      <div class="robotbuilder-section-label">Block coding</div>
+      <div id="robotcode-palette" class="robotcode-palette"></div>
+      <div id="robotcode-stack" class="robotcode-stack"></div>
+      <div class="robotbuilder-controls">
+        <button type="button" id="robotcode-run" class="robot-ctrl robot-ctrl-run"
+                onclick="runRobotProgram()">▶ Run fullscreen</button>
+        <button type="button" class="robot-ctrl" onclick="clearProgram()">🗑 Clear code</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     ROBOT BUILDER: FULLSCREEN RUN
+═══════════════════════════════════ -->
+<div id="robotrun-overlay">
+  <div id="robotrun-close" onclick="closeRobotRun()">&#10005;</div>
+  <div class="run-wrap">
+    <div id="robotrun-stage" class="run-stage"></div>
+    <div id="robotrun-code" class="run-code"></div>
   </div>
 </div>
 

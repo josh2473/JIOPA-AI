@@ -2282,6 +2282,35 @@ body.jiopa-barrel-roll {
 }
 
 /* ── ROBOT BUILDER ── */
+.robotbuilder-stage {
+  display: flex; align-items: center; justify-content: center;
+  height: 176px; border-radius: 14px;
+  background: radial-gradient(ellipse at 50% 82%, rgba(212,165,72,.16), rgba(212,165,72,0) 62%), #FFF9EE;
+  border: 1px solid rgba(200,17,85,.16);
+}
+.robot-svg { height: 100%; width: auto; overflow: visible; }
+
+/* Idle motion. Kept in CSS so the robot costs the rAF
+   scheduler in motion.js nothing while the overlay is open. */
+.robot-body  { animation: robot-bob 3.4s ease-in-out infinite; transform-origin: 100px 180px; }
+.robot-rotor { animation: robot-spin .5s linear infinite; }
+.robot-wheel { animation: robot-spin 2.6s linear infinite; }
+.robot-arm   { animation: robot-wave 3s ease-in-out infinite; }
+.robot-glow  { animation: robot-pulse 1.9s ease-in-out infinite; }
+.robot-ping  { animation: robot-ping 1.8s ease-out infinite; }
+.robot-ping-2 { animation-delay: .35s; }
+
+@keyframes robot-bob   { 0%,100% { transform: translateY(0); }    50% { transform: translateY(-4px); } }
+@keyframes robot-spin  { to { transform: rotate(360deg); } }
+@keyframes robot-wave  { 0%,100% { transform: rotate(0deg); }     50% { transform: rotate(-9deg); } }
+@keyframes robot-pulse { 0%,100% { opacity: 1; }                  50% { opacity: .45; } }
+@keyframes robot-ping  { 0% { opacity: 0; }  35% { opacity: .9; }  100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .robot-body, .robot-rotor, .robot-wheel,
+  .robot-arm, .robot-glow, .robot-ping { animation: none; }
+}
+
 .robotbuilder-section-label {
   font-family: 'Fredoka', 'Nunito', sans-serif; font-size: .68rem; font-weight: 600;
   color: var(--neon-cyan); letter-spacing: .06em; margin-top: 4px;
@@ -2308,8 +2337,152 @@ body.jiopa-barrel-roll {
   background: rgba(212,165,72,.08); border: 1px solid rgba(212,165,72,.3);
   border-radius: 12px; text-align: center;
 }
-.robot-preview { font-size: 2.2rem; margin-bottom: 8px; }
+.robot-name {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.05rem; font-weight: 700; letter-spacing: .06em;
+  color: var(--neon-blue); margin-bottom: 6px;
+}
 .robot-description { font-size: .78rem; line-height: 1.5; color: var(--text-primary); }
+.robot-facts {
+  list-style: none; margin: 10px 0 0; padding: 10px 0 0; text-align: left;
+  border-top: 1px solid rgba(212,165,72,.35);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.robot-facts li {
+  display: flex; gap: 8px; align-items: flex-start;
+  font-size: .7rem; line-height: 1.45; color: var(--text-dim);
+}
+.robot-facts li span { flex: none; font-size: .85rem; line-height: 1.2; }
+
+.robotbuilder-controls { display: flex; gap: 8px; }
+.robot-ctrl {
+  flex: 1; padding: 8px 10px; cursor: pointer;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: .68rem; font-weight: 600; color: var(--neon-blue);
+  background: rgba(200,17,85,.06); border: 1px solid rgba(200,17,85,.22);
+  border-radius: 10px; transition: background .2s ease, border-color .2s ease;
+}
+.robot-ctrl:hover { background: rgba(200,17,85,.12); border-color: rgba(200,17,85,.4); }
+.robot-part-btn:focus-visible,
+.robot-ctrl:focus-visible { outline: 2px solid var(--neon-blue); outline-offset: 2px; }
+
+/* ── BLOCK CODING ── */
+.robotcode-section {
+  display: flex; flex-direction: column; gap: 10px;
+  padding-top: 12px; border-top: 1px solid rgba(200,17,85,.18);
+}
+.robotcode-palette { display: flex; flex-wrap: wrap; gap: 6px; }
+.code-chip {
+  display: flex; align-items: center; gap: 5px; cursor: pointer;
+  padding: 7px 10px; border-radius: 999px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: .64rem; font-weight: 600; color: var(--text-primary);
+  background: #FFF9EE; border: 1px solid rgba(200,17,85,.22);
+  transition: background .2s ease, border-color .2s ease;
+}
+.code-chip:hover { background: #FDF0E4; border-color: rgba(200,17,85,.45); }
+.code-chip.code-modifier { background: rgba(212,165,72,.14); border-color: rgba(212,165,72,.5); }
+
+.robotcode-stack {
+  display: flex; flex-direction: column; gap: 5px;
+  min-height: 44px; max-height: 190px; overflow-y: auto;
+  padding: 8px; border-radius: 12px;
+  background: rgba(43,36,32,.04); border: 1px dashed rgba(43,36,32,.18);
+}
+.code-empty { font-size: .66rem; color: var(--text-dim); text-align: center; padding: 6px 0; }
+.code-block {
+  display: flex; align-items: center; gap: 7px; cursor: pointer;
+  padding: 7px 9px; border-radius: 9px;
+  font-size: .68rem; font-weight: 600; color: var(--text-primary);
+  background: #FFFBF4; border-left: 4px solid var(--neon-blue);
+  box-shadow: 0 1px 3px rgba(43,36,32,.08);
+}
+.code-block.code-modifier { border-left-color: var(--neon-orange); background: rgba(212,165,72,.1); }
+.code-block:hover .code-remove { opacity: 1; }
+.code-step {
+  flex: none; width: 17px; height: 17px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .55rem; color: var(--text-dim); background: rgba(43,36,32,.08);
+}
+.code-icon { flex: none; }
+.code-text { flex: 1; }
+.code-count {
+  flex: none; cursor: pointer; padding: 2px 8px; border-radius: 999px;
+  font-family: inherit; font-size: .62rem; font-weight: 700; color: #FFF9EE;
+  background: var(--neon-orange); border: none;
+}
+.code-remove { flex: none; opacity: .3; font-size: .7rem; color: var(--neon-pink); }
+.robot-ctrl-run {
+  color: #FFF9EE; background: var(--neon-green);
+  border-color: var(--neon-green);
+}
+.robot-ctrl-run:hover { background: #4d7a4b; border-color: #4d7a4b; }
+.robot-ctrl-run:disabled { opacity: .45; cursor: not-allowed; }
+.code-chip:focus-visible,
+.code-block:focus-visible,
+.code-count:focus-visible { outline: 2px solid var(--neon-blue); outline-offset: 2px; }
+
+/* ── FULLSCREEN RUN ── */
+#robotrun-overlay {
+  position: fixed; inset: 0; z-index: 940;
+  background: #2B2420;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .35s ease;
+}
+#robotrun-overlay.open { opacity: 1; pointer-events: all; }
+#robotrun-close {
+  position: absolute; top: 20px; right: 24px; z-index: 950;
+  width: 42px; height: 42px; cursor: pointer; font-size: 1.3rem;
+  display: flex; align-items: center; justify-content: center;
+  color: #FFF9EE; background: rgba(255,249,238,.08);
+  border: 1px solid rgba(255,249,238,.35); border-radius: 50%;
+}
+.run-wrap {
+  display: flex; align-items: center; gap: 28px;
+  width: min(94vw, 1180px); max-height: 90vh;
+}
+.run-stage { position: relative; flex: 1 1 auto; min-width: 0; }
+.run-svg { width: 100%; height: auto; max-height: 74vh; display: block; }
+.run-code {
+  flex: 0 0 230px; max-height: 74vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.run-code-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 9px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: .72rem; font-weight: 600;
+  color: rgba(255,249,238,.55); background: rgba(255,249,238,.07);
+  border-left: 4px solid transparent; transition: all .2s ease;
+}
+.run-code-row.active {
+  color: #2B2420; background: var(--neon-orange);
+  border-left-color: #FFF9EE; transform: translateX(5px);
+}
+.run-banner {
+  position: absolute; left: 50%; top: 10px; transform: translateX(-50%);
+  padding: 14px 28px; border-radius: 16px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.5rem; font-weight: 700; white-space: nowrap;
+  box-shadow: 0 12px 40px rgba(0,0,0,.45);
+}
+.run-win   { background: var(--neon-green);  color: #FFF9EE; }
+.run-crash { background: var(--neon-pink);   color: #FFF9EE; }
+.run-done  { background: var(--neon-orange); color: #2B2420; font-size: 1.1rem; }
+
+.run-shake { animation: run-shake .45s ease-in-out 2; }
+@keyframes run-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@media (max-width: 860px) {
+  .run-wrap { flex-direction: column; gap: 14px; }
+  .run-code { flex: none; width: 100%; max-height: 20vh; flex-direction: row; flex-wrap: wrap; }
+  .run-svg { max-height: 56vh; }
+  .run-banner { font-size: 1.15rem; padding: 12px 22px; }
+}
 
 @media (max-width: 700px) {
   .game-box { width: 94vw; padding: 16px; }
@@ -2319,4 +2492,6 @@ body.jiopa-barrel-roll {
   .memory-card { font-size: 1.3rem; }
   .robotbuilder-row { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .robot-part-name { font-size: .52rem; }
+  .robotbuilder-stage { height: 140px; }
+  .robot-facts li { font-size: .66rem; }
 }
