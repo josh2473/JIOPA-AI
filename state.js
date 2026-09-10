@@ -173,11 +173,29 @@ function showTyping(show) {
   if (el) el.classList.toggle('show', show);
 }
 
+/* Escape text before it goes anywhere near innerHTML.
+
+   The chat previously interpolated raw text straight into
+   innerHTML. Any child who typed <img src=x onerror=alert(1)> into
+   the box got script execution, and so did anything the AI or the
+   Serper search results happened to return. In a school exhibition
+   that is a prank waiting to happen; on a live site it is a real
+   hole. Everything user- or network-supplied now goes through
+   textContent or this function. */
+function escapeHtml(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /* Append a message to dashboard chat */
 function addMsg(who, text) {
   const div = document.createElement('div');
   div.className = 'msg msg-' + (who === 'user' ? 'user' : 'jiopa');
-  div.innerHTML = `<div class="msg-sender">${who === 'user' ? 'YOU' : 'JIOPA AI'}</div>${text}`;
+  div.innerHTML = `<div class="msg-sender">${who === 'user' ? 'YOU' : 'JIOPA AI'}</div>${escapeHtml(text)}`;
 
   const container = document.getElementById('chat-messages');
   if (container) {
@@ -193,8 +211,7 @@ function addMsg(who, text) {
 function addCinMsg(who, text) {
   const div = document.createElement('div');
   div.className = 'msg msg-' + (who === 'user' ? 'user' : 'jiopa');
-  div.style.fontSize = '.74rem';
-  div.innerHTML = `<div class="msg-sender">${who === 'user' ? 'YOU' : 'JIOPA AI'}</div>${text}`;
+  div.innerHTML = `<div class="msg-sender">${who === 'user' ? 'YOU' : 'JIOPA AI'}</div>${escapeHtml(text)}`;
 
   const container = document.getElementById('cin-messages');
   if (container) {

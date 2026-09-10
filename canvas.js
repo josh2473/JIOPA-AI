@@ -56,7 +56,17 @@ class Particle {
   }
 }
 
-for (let i = 0; i < 120; i++) particles.push(new Particle());
+/* The pool used to be a hard-coded 120 particles for every device.
+   Combined with the O(n²) connection pass below, that is 7,140
+   distance checks per frame on a phone that is also running TTS and
+   a chat request. Size it from the device tier instead. */
+function buildParticles() {
+  particles.length = 0;
+  const n = Motion.budget.bgParticles;
+  for (let i = 0; i < n; i++) particles.push(new Particle());
+}
+buildParticles();
+Motion.onTierChange(buildParticles);
 
 function drawBackground() {
   const c = MODE_CONFIG[currentMode];
@@ -107,17 +117,22 @@ function drawBackground() {
     bgCtx.globalAlpha = 1;
   }
 
-  // Neural network lines between close particles
-  for (let i = 0; i < particles.length; i++) {
+  // Neural network lines between close particles.
+  // The low tier sets linkDistance to 0 and skips this pass
+  // entirely — it is the single most expensive thing on the page.
+  const linkDist = Motion.budget.linkDistance;
+  const linkDist2 = linkDist * linkDist;
+  for (let i = 0; linkDist > 0 && i < particles.length; i++) {
     for (let j = i + 1; j < particles.length; j++) {
       const dx = particles[i].x - particles[j].x;
       const dy = particles[i].y - particles[j].y;
-      const d  = Math.sqrt(dx * dx + dy * dy);
-      if (d < 115) {
+      const d2 = dx * dx + dy * dy;
+      if (d2 < linkDist2) {
+        const d = Math.sqrt(d2);   // only when we already know it is close
         bgCtx.beginPath();
         bgCtx.moveTo(particles[i].x, particles[i].y);
         bgCtx.lineTo(particles[j].x, particles[j].y);
-        bgCtx.strokeStyle = `rgba(${c.r},${c.g},${c.b},${(1 - d / 115) * 0.1})`;
+        bgCtx.strokeStyle = `rgba(${c.r},${c.g},${c.b},${(1 - d / linkDist) * 0.1})`;
         bgCtx.lineWidth   = 0.5;
         bgCtx.stroke();
       }
@@ -125,7 +140,8 @@ function drawBackground() {
   }
 
   // Digital rain streaks
-  for (let i = 0; i < 4; i++) {
+  const rain = Motion.budget.digitalRain;
+  for (let i = 0; i < rain; i++) {
     const x    = (bgT * 0.008 * (i + 1) * 41) % bgCanvas.width;
     const len  = 55 + i * 18;
     const yBase = (bgT * 0.45 + i * 180) % bgCanvas.height;
@@ -139,9 +155,9 @@ function drawBackground() {
 
   particles.forEach(p => { p.update(); p.draw(); });
   bgT++;
-  requestAnimationFrame(drawBackground);
 }
-requestAnimationFrame(drawBackground);
+
+Motion.register('background', drawBackground);
 
 
 /* ══════════════════════════════════════════════════
@@ -149,7 +165,7 @@ requestAnimationFrame(drawBackground);
 ══════════════════════════════════════════════════ */
 function animateHair() {
   const c = document.getElementById('hair-canvas');
-  if (!c) { requestAnimationFrame(animateHair); return; }
+  if (!c) return;
   const ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
   hairPhase += 0.018;
@@ -187,9 +203,9 @@ function animateHair() {
     ctx.stroke();
     ctx.globalAlpha  = 1;
   }
-  requestAnimationFrame(animateHair);
 }
-animateHair();
+
+Motion.register('hair', animateHair);
 
 
 /* ══════════════════════════════════════════════════
@@ -197,11 +213,19 @@ animateHair();
 ══════════════════════════════════════════════════ */
 function animateCinHair() {
   const c = document.getElementById('cin-hair');
-  if (!c) { requestAnimationFrame(animateCinHair); return; }
+  if (!c) return;
 
-  // Resize to fill its space
-  c.width  = c.offsetWidth  || window.innerWidth * 0.5;
-  c.height = c.offsetHeight || window.innerHeight;
+  // The canvas used to be resized on every single frame. Assigning
+  // canvas.width reallocates the backing store and clears it, so
+  // this was throwing away and rebuilding a full-screen buffer
+  // sixty times a second. Resize only when the size actually
+  // changed.
+  const wantW = c.offsetWidth  || Math.round(window.innerWidth * 0.5);
+  const wantH = c.offsetHeight || window.innerHeight;
+  if (c.width !== wantW || c.height !== wantH) {
+    c.width  = wantW;
+    c.height = wantH;
+  }
 
   const ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
@@ -240,9 +264,9 @@ function animateCinHair() {
     ctx.stroke();
     ctx.globalAlpha  = 1;
   }
-  requestAnimationFrame(animateCinHair);
 }
-animateCinHair();
+
+Motion.register('cin-hair', animateCinHair);
 
 
 /* ══════════════════════════════════════════════════

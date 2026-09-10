@@ -41,6 +41,16 @@ async function sendMessage() {
     showTyping(false);
   }
 
+  // getAIResponse() returns null when every tier fails: the model
+  // proxy, the search fallback and the local knowledge base. The
+  // old code then called reply.length and threw a TypeError, which
+  // left the chat silently dead. Give the child an answer either
+  // way.
+  if (!reply) {
+    reply = "I could not reach my AI service just then. Please ask me again in a moment — "
+          + "or try a science, robotics or Jiopa School question, which I can answer on my own.";
+  }
+
   addMsg('jiopa', reply);
   const bubbleText = reply.length > 140 ? reply.slice(0, 137) + '...' : reply;
   showSpeech(bubbleText);
@@ -66,7 +76,7 @@ async function sendCinMessage() {
 
   const dashDiv = document.createElement('div');
   dashDiv.className = 'msg msg-user';
-  dashDiv.innerHTML = `<div class="msg-sender">YOU</div>${text}`;
+  dashDiv.innerHTML = `<div class="msg-sender">YOU</div>${escapeHtml(text)}`;
   const dashChat = document.getElementById('chat-messages');
   if (dashChat) {
     dashChat.appendChild(dashDiv);
@@ -91,6 +101,16 @@ async function sendCinMessage() {
     reply = 'AI error: ' + (msg || 'Unknown error');
   } finally {
     showTyping(false);
+  }
+
+  // getAIResponse() returns null when every tier fails: the model
+  // proxy, the search fallback and the local knowledge base. The
+  // old code then called reply.length and threw a TypeError, which
+  // left the chat silently dead. Give the child an answer either
+  // way.
+  if (!reply) {
+    reply = "I could not reach my AI service just then. Please ask me again in a moment — "
+          + "or try a science, robotics or Jiopa School question, which I can answer on my own.";
   }
 
   addMsg('jiopa', reply);

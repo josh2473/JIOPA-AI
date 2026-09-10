@@ -47,18 +47,26 @@ function showSplash() {
   const loader = document.getElementById('loader');
   if (loader) loader.classList.add('hidden');
 
-  // Start splash particle canvas
-  initSplashParticles();
+  /* Try to bring up the WebGL room first. It returns false on the
+     low tier, without WebGL2, under reduced-motion, or with
+     ?fx=off — in every one of those cases we fall back to the
+     original 2D particle splash, which has to keep working. */
+  const roomIsLive = FX.init(document.getElementById('fx-canvas'));
 
-  // Set AI status based on whether key is configured
-  // Gemini removed; only OpenRouter/Serper/local remain.
-  if (hasValidOpenRouterKey()) {
-    setAIStatus('live');
-  } else if (hasValidSerperKey()) {
-    setAIStatus('live');
+  if (roomIsLive) {
+    Titles.play();
   } else {
-    setAIStatus('live');
+    initSplashParticles();
   }
+
+  // The API keys now live on the server, so the browser genuinely
+  // cannot know whether they are configured — the old
+  // hasValidOpenRouterKey()/hasValidSerperKey() calls here were
+  // referencing functions that no longer exist and threw a
+  // ReferenceError on every boot. The first real request is what
+  // tells us the truth, and gemini.js already sets the status from
+  // its response.
+  setAIStatus('live');
 }
 
 
@@ -67,72 +75,91 @@ function initSplashParticles() {
   const canvas = document.getElementById('splash-canvas');
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  const ctx  = canvas.getContext('2d');
+  let size   = Motion.fitCanvas(canvas, ctx);
 
-  // Build particle array
-  const sp = [];
-  for (let i = 0; i < 90; i++) {
-    sp.push({
-      x:     Math.random() * canvas.width,
-      y:     Math.random() * canvas.height,
+  // Particle count now comes from the device tier. The old code
+  // always built 90 particles and then ran an O(n²) connection
+  // pass over them — 4,005 distance checks every single frame,
+  // on whatever phone happened to open the page.
+  let sp = [];
+  function build() {
+    const n = Motion.budget.splashParticles;
+    sp = Array.from({ length: n }, () => ({
+      x:     Math.random() * size.w,
+      y:     Math.random() * size.h,
       vx:    (Math.random() - 0.5) * 0.5,
       vy:    (Math.random() - 0.5) * 0.5,
       r:     Math.random() * 1.5 + 0.3,
       alpha: Math.random() * 0.5 + 0.2,
-      color: Math.random() > 0.5 ? '0,212,255' : '123,47,255',
-    });
+    }));
   }
+  build();
 
-  function drawSplashParticles() {
-    // Stop drawing once splash is hidden
+  const onResize = () => { size = Motion.fitCanvas(canvas, ctx); build(); };
+  window.addEventListener('resize', onResize);
+  Motion.onTierChange(build);
+
+  Motion.register('splash', dt => {
     const splash = document.getElementById('splash');
-    if (!splash || splash.classList.contains('hidden')) return;
+    if (!splash || splash.classList.contains('hidden')) {
+      Motion.unregister('splash');
+      window.removeEventListener('resize', onResize);
+      return;
+    }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, size.w, size.h);
 
-    sp.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+    for (const p of sp) {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if (p.x < 0 || p.x > size.w) p.vx *= -1;
+      if (p.y < 0 || p.y > size.h) p.vy *= -1;
 
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+      ctx.fillStyle = `rgba(200,17,85,${p.alpha})`;
       ctx.fill();
-    });
+    }
 
-    // Draw connecting lines between close particles
-    for (let i = 0; i < sp.length; i++) {
-      for (let j = i + 1; j < sp.length; j++) {
-        const dx = sp[i].x - sp[j].x;
-        const dy = sp[i].y - sp[j].y;
-        const d  = Math.sqrt(dx * dx + dy * dy);
-        if (d < 100) {
+    // The connection pass is the expensive half, so the low tier
+    // skips it entirely (linkDistance 0) rather than doing it badly.
+    const link = Motion.budget.linkDistance;
+    if (link > 0) {
+      for (let i = 0; i < sp.length; i++) {
+        for (let j = i + 1; j < sp.length; j++) {
+          const dx = sp[i].x - sp[j].x;
+          const dy = sp[i].y - sp[j].y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > link * link) continue;          // compare squared — no sqrt
+          const d = Math.sqrt(d2);
           ctx.beginPath();
           ctx.moveTo(sp[i].x, sp[i].y);
           ctx.lineTo(sp[j].x, sp[j].y);
-          ctx.strokeStyle = `rgba(200,17,85,${(1 - d / 100) * 0.12})`;
-          ctx.lineWidth   = 0.5;
+          ctx.strokeStyle = `rgba(200,17,85,${(1 - d / link) * 0.14})`;
+          ctx.lineWidth = 0.5;
           ctx.stroke();
         }
       }
     }
-
-    requestAnimationFrame(drawSplashParticles);
-  }
-
-  drawSplashParticles();
+  });
 }
 
 
 /* ── ENTER APP ── */
 function enterApp() {
-  // Hide splash
+  /* The splash pushes past the camera rather than fading, so it
+     reads as moving INTO the room instead of cutting to a
+     different screen. Titles.exit() falls back to a plain hide
+     when the room never started. */
   const splash = document.getElementById('splash');
-  if (splash) splash.classList.add('hidden');
+  if (FX.active) {
+    Titles.exit();
+    // The room stops being the subject and becomes scenery.
+    FX.setQuality('ambient');
+  } else if (splash) {
+    splash.classList.add('hidden');
+  }
 
   // Show dashboard
   const app = document.getElementById('app');
